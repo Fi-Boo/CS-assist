@@ -1,13 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <title>Call Service Template</title>
-</head>
-<body>
-    
-<script src="myscripts.js"></script>    
-</body>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <div
+          id="noteContainer"
+          style="
+            background: #fff8dc;
+            border-bottom: 1px solid #ccc;
+            padding: 15px;
+            font-size: 16px;
+            width: 100%;
+          "
+        >
+          <button
+            id="toggleNoteBtn"
+            style="
+              float: right;
+              background-color: #e0a800;
+              color: white;
+              border: none;
+              padding: 5px 10px;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Hide Note
+          </button>
+          <div id="noteContent">
+            <strong>Note:</strong><br />
+            If CMS does not automatically load the caller, proceed with the
+            following steps:<br />
+            - Ask for an account number or the mobile number registered with the
+            account.<br />
+            - Search via top-left search bar in CMS<br />
+            - Proceed with ID confirmation.
+          </div>
+        </div>
+        <div class="field">
+          <label for="customerName">Customer Name:</label>
+          <input type="text" id="customerName" />
+        </div>
+
+        <div class="field">
+          <input type="checkbox" id="idCustomer" />
+          <label for="idCustomer">Note - ID Customer!</label>
+        </div>
+
+        <div class="field">
+          <label>Customer Type:</label>
+          <input type="radio" id="primary" name="custType" value="P" />
+          <label for="primary">Primary</label>
+          <input type="radio" id="secondary" name="custType" value="S" />
+          <label for="secondary">Secondary</label>
+        </div>
+
+        <div class="field">
+          <label>Reason for Call:</label>
+          <button class="reason-button" data-target="accountsDetail">
+            Accounts
+          </button>
+          <button class="reason-button" data-target="troubleDetail">
+            Troubleshooting
+          </button>
+
+          <div id="accountsDetail" class="reason-details">
+            <strong>Accounts Options:</strong><br />
+            - Update billing info<br />
+            - View payment history<br />
+            - Cancel/renew subscription
+          </div>
+
+          <div id="troubleDetail" class="reason-details">
+            <strong>Troubleshooting Options:</strong><br />
+            - Internet issues<br />
+            - Device not working<br />
+            - Report outage
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h3>Call Summary</h3>
+        <div class="notes-box" id="notes">
+          Customer Name: ID Verified: Reason for Call:
+        </div>
+        <button
+          id="copyBtn"
+          style="
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #1d77a5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+          "
+        >
+          Copy Notes to Clipboard
+        </button>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
 </html>
