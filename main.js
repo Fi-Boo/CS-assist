@@ -1,5 +1,5 @@
 const reasonsData = {
-  "Accounts": {
+  Accounts: {
     suboptions: {
       "Late Payment": {
         notes: "Customer reported late payment.",
@@ -109,14 +109,16 @@ const reasonsData = {
 const accountYesRadio = document.getElementById("accountYes");
 const accountNoRadio = document.getElementById("accountNo");
 const extraInfoDiv = document.getElementById("extraInfo");
-const customerNameInput = document.getElementById("customerName");
-const idCustomerCheckbox = document.getElementById("idCustomer");
-const accountTypeRadios = document.querySelectorAll('input[name="accountType"]');
+const accountTypeRadios = document.querySelectorAll(
+  'input[name="accountType"]'
+);
 const reasonButtonsDiv = document.getElementById("reasonButtons");
 const subOptionsDiv = document.getElementById("subOptions");
 const notesArea = document.getElementById("notesArea");
 const workflowDiv = document.getElementById("workflowSteps");
 const copyNotesBtn = document.getElementById("copyNotes");
+const customerInput = document.getElementById("customerNameInput");
+const idCheckbox = document.getElementById("idConfirmedCheckbox");
 
 let selectedReason = null;
 let selectedSuboption = null;
@@ -269,52 +271,87 @@ function updateConditionalInfo() {
   });
 }
 
-// Add note line if not already in textarea
-function addNoteLine(line) {
-  if (!line) return;
-  const lines = notesArea.value.split("\n").map((l) => l.trim());
-  if (!lines.includes(line)) {
-    if (notesArea.value.trim() !== "") notesArea.value += "\n" + line;
-    else notesArea.value = line;
-  }
+// right side notes header
+
+function getDynamicHeader() {
+  const customerName = customerInput.value.trim();
+  const idConfirmed = idCheckbox.checked ? "confirmed" : "";
+
+  return `Customer: ${customerName}\nID: ${idConfirmed}\n\nNotes\n`;
 }
 
-// Remove note line if present
-function removeNoteLine(line) {
-  if (!line) return;
-  const lines = notesArea.value.split("\n").map((l) => l.trim());
-  const filtered = lines.filter((l) => l !== line);
-  notesArea.value = filtered.join("\n");
+function updateNotesHeaderOnly() {
+  const current = notesArea.value.split("\n");
+  const newHeader = getDynamicHeader().split("\n");
+
+  // Preserve dynamic notes (everything after line 4)
+  const userNotes = current.slice(4).join("\n");
+
+  // Rebuild the entire notes area
+  notesArea.value = [...newHeader, userNotes].join("\n");
 }
 
-// Update the notes area with base info plus reason/suboption notes
+// Listeners
+customerInput.addEventListener("input", updateNotesHeaderOnly);
+idCheckbox.addEventListener("change", updateNotesHeaderOnly);
+
 function updateNotes() {
-  let notesLines = [];
+  const lines = notesArea.value.split("\n");
 
-  const customerName = customerNameInput.value.trim();
-  const idChecked = idCustomerCheckbox.checked;
+  // Preserve the header (first 4 lines)
+  const headerLines = lines.slice(0, 4);
 
-  if (customerName) notesLines.push(`Customer Name: ${customerName}`);
-  if (idChecked) notesLines.push("ID Confirmed");
-  if (selectedReason && selectedSuboption) {
-    const reasonNote =
-      reasonsData[selectedReason]?.suboptions[selectedSuboption]?.notes;
-    if (reasonNote) notesLines.push(reasonNote);
+  // Preserve existing notes (everything after header), trim trailing empty lines
+  let existingNotes = lines.slice(4);
+
+  // Remove trailing empty lines from existingNotes
+  while (existingNotes.length > 0 && existingNotes[existingNotes.length - 1].trim() === "") {
+    existingNotes.pop();
   }
 
-  // Add checked workflow step notes
+  // Build new generated notes
+  let generatedNotes = [];
+
+  if (selectedReason && selectedSuboption) {
+    const reasonNote = reasonsData[selectedReason]?.suboptions[selectedSuboption]?.notes;
+    if (reasonNote) generatedNotes.push(reasonNote);
+  }
+
+  const steps = reasonsData[selectedReason]?.suboptions[selectedSuboption]?.steps || [];
   Object.entries(suboptionState).forEach(([key, value]) => {
-    if (typeof value === "boolean" && value === true) {
-      const steps =
-        reasonsData[selectedReason]?.suboptions[selectedSuboption]?.steps || [];
-      const stepInfo = steps.find((s) => s.id === key);
-      if (stepInfo && stepInfo.note) notesLines.push(stepInfo.note);
-    } else if (typeof value === "string") {
-      // handled by radio change event's addNoteLine
+    const step = steps.find(s => s.id === key);
+    if (!step) return;
+
+    if (step.type === "checkbox" && value === true && step.note) {
+      generatedNotes.push(step.note);
+    }
+
+    if (step.type === "radio" && typeof value === "string") {
+      const selectedOption = step.options.find(opt => opt.value === value);
+      if (selectedOption?.note) generatedNotes.push(selectedOption.note);
     }
   });
 
-  notesArea.value = notesLines.join("\n");
+  // Avoid duplicate generated notes
+  generatedNotes = generatedNotes.filter(note => !existingNotes.includes(note));
+
+  // Append new notes to end
+  const allNotes = [...existingNotes, ...generatedNotes];
+
+  // Set updated value
+  notesArea.value = [...headerLines, ...allNotes].join("\n");
+}
+
+function addNoteLine(note) {
+  if (!note || !note.trim()) return;
+
+  const currentText = notesArea.value.trim();
+  const newNote = note.trim();
+
+  // If there's existing content, append with a newline
+  notesArea.value = currentText
+    ? `${currentText}\n${newNote}`
+    : newNote;
 }
 
 // Clear workflow container and reset state
@@ -334,8 +371,8 @@ function bindEvents() {
     updateNotes();
   });
 
-  customerNameInput.addEventListener("input", updateNotes);
-  idCustomerCheckbox.addEventListener("change", updateNotes);
+  //customerNameInput.addEventListener("input", updateNotes);
+  //idCustomerCheckbox.addEventListener("change", updateNotes);
 
   accountTypeRadios.forEach((radio) =>
     radio.addEventListener("change", updateNotes)
