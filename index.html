@@ -29,25 +29,29 @@
         </div>
 
         <div class="input-group">
-          <label for="customerName"
-            >Customer:
-            <input type="text" id="customerNameInput" />
+          <label for="customerName">
+            <input type="text" id="customerNameInput" placeholder="Input Customer Name Here"/>
           </label>
           <label>
             <input type="checkbox" id="idConfirmedCheckbox" />
-            ID Check   >>> Full name | DOB | Service Address
+            ID Check  >>  Full name | DOB | Service Address
           </label>
         </div>
 
         <div class="input-group">
-          <label>Caller is:</label>
-          <label
-            ><input type="radio" name="accountType" value="P" /> Primary</label
-          >
-          <label
-            ><input type="radio" name="accountType" value="S" />
-            Secondary</label
-          >
+          <label class="radio-group-label">Call type</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="callType" value="inbound" /> Inbound
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="callType" value="outbound" /> Outbound
+            </label>
+          </div>
+          <div id="callPrompt" class="info-text hidden">
+            <strong>MUST SAY:</strong> This call is recorded for training and quality
+            purposes
+          </div>
         </div>
 
         <hr />

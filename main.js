@@ -1,6 +1,80 @@
 const reasonsData = {
   Accounts: {
     suboptions: {
+      "Edit Contact Details": {
+        notes: "eu rqst to edit contact details.",
+        steps: [
+          {
+            id: "step1",
+            type: "checkbox",
+            label: "2FA",
+            note: "2FA.",
+          },
+          {
+            id: "step2",
+            type: "checkbox",
+            label:
+              "Edit user details via clicking on their name or Edit in the top right corner",
+            note: "eu details updated",
+          },
+          {
+            id: "infoAlways1",
+            type: "info",
+            label: "ONLY primary users can edit account details",
+          },
+        ],
+      },
+      "Edit Payment Details": {
+        notes: "eu rqst to edit payment details.",
+        steps: [
+          {
+            id: "step1",
+            type: "checkbox",
+            label: "2FA",
+            note: "2FA.",
+          },
+          {
+            id: "infoAlways1",
+            type: "info",
+            label: "Go to Function > Update Payment Details"
+          },
+          {
+            id: "step2",
+            type: "radio",
+            label: "Payment method",
+            options: [
+              {
+                label: "Credit Card",
+                value: "cc"
+                
+              },
+              {
+                label: "Debit Account",
+                value: "da"
+                
+              },
+            ],
+          },
+          {
+            id: "info1",
+            type: "info",
+            label: "SMS message sent to eu with link they access to update CC details",
+            dependsOn: { stepId: "step2", value: "cc" },
+          },
+          {
+            id: "info2",
+            type: "info",
+            label: "Acquire Debit Account Name/BSB/Number from eu",
+            dependsOn: { stepId: "step2", value: "da" },
+          },
+          {
+            id: "step3",
+            type: "checkbox",
+            label: "Complete Payment Detail Updating",
+            note: "eu payment details updated",
+          }
+        ],
+      },
       "Late Payment": {
         notes: "Customer reported late payment.",
         steps: [
@@ -119,6 +193,8 @@ const workflowDiv = document.getElementById("workflowSteps");
 const copyNotesBtn = document.getElementById("copyNotes");
 const customerInput = document.getElementById("customerNameInput");
 const idCheckbox = document.getElementById("idConfirmedCheckbox");
+const callTypeRadios = document.querySelectorAll('input[name="callType"]');
+const callPrompt = document.getElementById("callPrompt");
 
 let selectedReason = null;
 let selectedSuboption = null;
@@ -132,6 +208,22 @@ function toggleExtraInfo() {
     extraInfoDiv.classList.add("hidden");
   }
 }
+
+// Outbound Show disclaimer
+document.addEventListener("DOMContentLoaded", () => {
+  const callTypeRadios = document.querySelectorAll('input[name="callType"]');
+  const callPrompt = document.getElementById("callPrompt");
+
+  callTypeRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      if (radio.value === "outbound") {
+        callPrompt.classList.remove("hidden");
+      } else {
+        callPrompt.classList.add("hidden");
+      }
+    });
+  });
+});
 
 // Render reason buttons
 function renderReasonButtons() {
@@ -160,6 +252,19 @@ function renderSuboptions(reason) {
     btn.dataset.suboption = suboptName;
     subOptionsDiv.appendChild(btn);
   });
+}
+
+function removeNoteLine(note) {
+  if (!note) return; // exit early if note is undefined, null, empty, or falsey
+
+  const lines = notesArea.value.split("\n");
+  const trimmedNote = note.trim();
+
+  const newLines = lines.filter(line => line.trim() !== trimmedNote);
+
+  if (newLines.length !== lines.length) {
+    notesArea.value = newLines.join("\n");
+  }
 }
 
 // Render workflow steps for selected reason and suboption
@@ -247,7 +352,10 @@ function renderWorkflowSteps(reason, suboption) {
       infoP.id = step.id;
       infoP.textContent = step.label;
       infoP.className = "info-text";
-      infoP.style.display = "none";
+
+      // Show immediately if no dependsOn condition
+      infoP.style.display = step.dependsOn ? "none" : "block";
+
       workflowDiv.appendChild(infoP);
     }
   });
@@ -277,17 +385,27 @@ function getDynamicHeader() {
   const customerName = customerInput.value.trim();
   const idConfirmed = idCheckbox.checked ? "confirmed" : "";
 
-  return `Customer: ${customerName}\nID: ${idConfirmed}\n\nNotes\n`;
+  let callTypeValue = "";
+  callTypeRadios.forEach((radio) => {
+    if (radio.checked) {
+      if (radio.value === "inbound") callTypeValue = "In";
+      else if (radio.value === "outbound") callTypeValue = "Out (disclaimer)";
+    }
+  });
+
+  return `Customer: ${customerName}\nID: ${idConfirmed}\nCall: ${callTypeValue}\n\nNotes\n`;
 }
 
 function updateNotesHeaderOnly() {
   const current = notesArea.value.split("\n");
+
+  // Get the new header
   const newHeader = getDynamicHeader().split("\n");
 
-  // Preserve dynamic notes (everything after line 4)
-  const userNotes = current.slice(4).join("\n");
+  // Preserve everything after the 5th line (index 5 onward)
+  const userNotes = current.slice(5).join("\n");
 
-  // Rebuild the entire notes area
+  // Rebuild with header and preserved notes
   notesArea.value = [...newHeader, userNotes].join("\n");
 }
 
@@ -295,26 +413,35 @@ function updateNotesHeaderOnly() {
 customerInput.addEventListener("input", updateNotesHeaderOnly);
 idCheckbox.addEventListener("change", updateNotesHeaderOnly);
 
+
 function updateNotes() {
   const lines = notesArea.value.split("\n");
 
-  // Preserve the header (first 4 lines)
-  const headerLines = lines.slice(0, 4);
+  // Step 1: Get top 5 header lines
+  const headerLines = lines.slice(0, 5);
 
-  // Preserve existing notes (everything after header), trim trailing empty lines
-  let existingNotes = lines.slice(4);
+  // Step 2: Get existing body (everything after header), clean blanks
+  let bodyLines = lines.slice(5);
 
-  // Remove trailing empty lines from existingNotes
-  while (existingNotes.length > 0 && existingNotes[existingNotes.length - 1].trim() === "") {
-    existingNotes.pop();
+  // Clean leading blank lines
+  while (bodyLines.length > 0 && bodyLines[0].trim() === "") {
+    bodyLines.shift();
   }
 
-  // Build new generated notes
-  let generatedNotes = [];
+  // Clean trailing blank lines
+  while (bodyLines.length > 0 && bodyLines[bodyLines.length - 1].trim() === "") {
+    bodyLines.pop();
+  }
+
+  // Step 3: Generate workflow notes (but only if not already in bodyLines)
+  const existingBodySet = new Set(bodyLines.map(line => line.trim()));
+  let newNotes = [];
 
   if (selectedReason && selectedSuboption) {
     const reasonNote = reasonsData[selectedReason]?.suboptions[selectedSuboption]?.notes;
-    if (reasonNote) generatedNotes.push(reasonNote);
+    if (reasonNote && !existingBodySet.has(reasonNote.trim())) {
+      newNotes.push(reasonNote);
+    }
   }
 
   const steps = reasonsData[selectedReason]?.suboptions[selectedSuboption]?.steps || [];
@@ -322,25 +449,28 @@ function updateNotes() {
     const step = steps.find(s => s.id === key);
     if (!step) return;
 
-    if (step.type === "checkbox" && value === true && step.note) {
-      generatedNotes.push(step.note);
+    if (step.type === "checkbox" && value === true && step.note && !existingBodySet.has(step.note.trim())) {
+      newNotes.push(step.note);
     }
 
     if (step.type === "radio" && typeof value === "string") {
       const selectedOption = step.options.find(opt => opt.value === value);
-      if (selectedOption?.note) generatedNotes.push(selectedOption.note);
+      if (selectedOption?.note && !existingBodySet.has(selectedOption.note.trim())) {
+        newNotes.push(selectedOption.note);
+      }
     }
   });
 
-  // Avoid duplicate generated notes
-  generatedNotes = generatedNotes.filter(note => !existingNotes.includes(note));
+  // Step 4: Assemble the final result
+  const result = [
+    ...headerLines,
+    ...bodyLines,
+    ...newNotes
+  ];
 
-  // Append new notes to end
-  const allNotes = [...existingNotes, ...generatedNotes];
-
-  // Set updated value
-  notesArea.value = [...headerLines, ...allNotes].join("\n");
+  notesArea.value = result.join("\n").trimEnd();
 }
+
 
 function addNoteLine(note) {
   if (!note || !note.trim()) return;
@@ -349,9 +479,7 @@ function addNoteLine(note) {
   const newNote = note.trim();
 
   // If there's existing content, append with a newline
-  notesArea.value = currentText
-    ? `${currentText}\n${newNote}`
-    : newNote;
+  notesArea.value = currentText ? `${currentText}\n${newNote}` : newNote;
 }
 
 // Clear workflow container and reset state
@@ -371,8 +499,16 @@ function bindEvents() {
     updateNotes();
   });
 
-  //customerNameInput.addEventListener("input", updateNotes);
-  //idCustomerCheckbox.addEventListener("change", updateNotes);
+  callTypeRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      updateNotesHeaderOnly();
+      if (radio.value === "outbound") {
+        callPrompt.classList.remove("hidden");
+      } else {
+        callPrompt.classList.add("hidden");
+      }
+    });
+  });
 
   accountTypeRadios.forEach((radio) =>
     radio.addEventListener("change", updateNotes)

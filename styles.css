@@ -90,6 +90,13 @@ h2, h3 {
   cursor: pointer;
 }
 
+#callPrompt {
+  color: white;
+  margin: 0 !important;
+  padding: 1rem;
+  background: red;
+}
+
 hr {
   border: 0;
   border-top: 1px solid #ccc;
