@@ -1,3 +1,15 @@
+:root {
+  --sl-color-primary-50:  #e6f4e9;
+  --sl-color-primary-100: #c2e4c7;
+  --sl-color-primary-200: #9fd4a4;
+  --sl-color-primary-300: #7ac47f;
+  --sl-color-primary-400: #56b45c;
+  --sl-color-primary-500: #349d42;
+  --sl-color-primary-600: #1e7d30;
+  --sl-color-primary-700: #136527;
+  --sl-color-primary-800: #0c4b1b;
+  --sl-color-primary-900: #072f11;
+}
 * {
   box-sizing: border-box;
   padding: 0;
@@ -8,6 +20,7 @@ body {
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
+  background: grey;
 }
 
 #container {
@@ -31,6 +44,7 @@ body {
   padding: 1rem 1rem 0rem;
   border: 1px solid black;
   border-radius: 0.5rem;
+  background :#fff;
 }
 
 #reason-container {
@@ -42,6 +56,7 @@ body {
   padding: 1rem 0.5rem 0rem;
   border: 1px solid black;
   border-radius: 0.5rem;
+  background :#fff;
 }
 
 #notes-area {
@@ -56,8 +71,22 @@ body {
   padding: 1rem;
   border: 1px solid black;
   border-radius: 0.5rem;
+  background :#fff;
 }
 
+#split-container {
+  display: flex;
+  height: 100%;
+}
+
+#steps-content {
+  flex: 11;
+  padding: 0rem 0.5rem;
+}
+
+#decisionTree {
+  flex: 9;
+}
 
 .hidden {
   display: none;
@@ -147,4 +176,13 @@ sl-alert.info {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
   gap: 0.5rem; /* spacing between columns and rows */
+}
+
+.option-buttons-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.options-btn {
+  width: 10rem;
 }

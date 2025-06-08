@@ -75,7 +75,7 @@ const reasonsData = {
       "Edit/Update Details": {},
       "Service Closure": {},
       "Add Secondary Contact": {},
-      "Complaint": {},
+      Complaint: {},
       "Plan Speed Change": {},
     },
   },
@@ -234,36 +234,46 @@ function createButton(label, category, callback) {
 }
 
 function renderTabs(data) {
-  reasonsTabs.innerHTML = ""; // Clear any existing tabs first
+  reasonsTabs.innerHTML = "";
 
   Object.entries(data).forEach(([tabName, tabContent], index) => {
-    // Create the tab button
     const tab = document.createElement("sl-tab");
     tab.slot = "nav";
     tab.panel = `panel-${index}`;
     tab.innerText = tabName;
 
-    // Create the tab panel container
     const panel = document.createElement("sl-tab-panel");
     panel.name = `panel-${index}`;
 
-    // Create container for buttons
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("two-column-grid");
 
-    // Create buttons for immediate suboptions only
-    if (tabContent.subCategories) {
-      Object.keys(tabContent.subCategories).forEach((label) => {
-        const button = document.createElement("sl-button");
-        button.innerText = label;
-        button.variant = "default";
-        // Just log on click for now
-        button.addEventListener("click", () => {
-          console.log(`Clicked button: ${label} in tab: ${tabName}`);
-        });
+    let activeButton = null;
 
-        buttonContainer.appendChild(button);
-      });
+    if (tabContent.subCategories) {
+      Object.entries(tabContent.subCategories).forEach(
+        ([subCatName, subCatData]) => {
+          const button = document.createElement("sl-button");
+          button.innerText = subCatName;
+          button.size = "medium";
+          button.variant = "default"; // inactive state
+
+          button.addEventListener("click", () => {
+            // Reset previous
+            if (activeButton && activeButton !== button) {
+              activeButton.variant = "default";
+            }
+
+            // Set current
+            button.variant = "primary"; // visually stands out
+            activeButton = button;
+
+            renderOptions(subCatData.options || {});
+          });
+
+          buttonContainer.appendChild(button);
+        }
+      );
     }
 
     panel.appendChild(buttonContainer);
@@ -272,9 +282,50 @@ function renderTabs(data) {
   });
 }
 
+function renderOptions(optionsObj) {
+  const optionsContainer = document.getElementById("option-buttons");
+  optionsContainer.innerHTML = ""; // Clear previous options
+
+  if (Object.keys(optionsObj).length === 0) {
+    const noneText = document.createElement("p");
+    noneText.innerText = "No options available.";
+    optionsContainer.appendChild(noneText);
+    return;
+  }
+
+  const flexContainer = document.createElement("div");
+  flexContainer.classList.add("option-buttons-row");
+
+  let activeOptionBtn = null;
+
+  Object.keys(optionsObj).forEach((optionKey) => {
+    const btn = document.createElement("sl-button");
+    btn.innerText = optionKey;
+    btn.variant = "default";
+    btn.size = "small";
+    btn.className = "options-btn";
+
+    btn.addEventListener("click", () => {
+      // Reset previous active button
+      if (activeOptionBtn && activeOptionBtn !== btn) {
+        activeOptionBtn.variant = "default";
+      }
+
+      // Set current active button
+      btn.variant = "primary";
+      activeOptionBtn = btn;
+
+      console.log(`Selected option: ${optionKey}`);
+      // Future: Load steps or details into steps-content
+    });
+
+    flexContainer.appendChild(btn);
+  });
+
+  optionsContainer.appendChild(flexContainer);
+}
+
 renderTabs(reasonsData);
-
-
 
 // function renderTabs(data, onOptionSelect) {
 //   Object.entries(data).forEach(([tabName, tabContent], index) => {
@@ -340,7 +391,7 @@ renderTabs(reasonsData);
 //   // 🛡️ Prevent double render of the same section
 //   stepsContent.dataset.renderedFor = label;
 //   stepsContent.innerHTML = "";
-  
+
 //   const header = document.createElement("h3");
 //   header.innerText = label;
 //   stepsContent.appendChild(header);
