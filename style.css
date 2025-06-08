@@ -1,0 +1,150 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+#top-half {
+  display: flex;
+  flex: 1;
+  gap: 1rem;
+}
+
+#top-left {
+  flex: 11;
+  padding: 1rem 1rem 0rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+}
+
+#reason-container {
+  text-align: center;
+}
+
+#top-right {
+  flex: 9;
+  padding: 1rem 0.5rem 0rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+}
+
+#notes-area {
+  width: 100%;
+  height: 85%;
+  padding: 1rem;
+  overflow-y: scroll;
+}
+
+#steps-container {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+}
+
+
+.hidden {
+  display: none;
+}
+
+.inline-radio {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  width: 100px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.form-row sl-input,
+.form-row sl-radio-group,
+.form-row sl-checkbox {
+  flex: 1;
+}
+
+sl-radio-group::part(base) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+sl-radio-button::part(button) {
+  min-width: 100px;
+  text-align: center;
+}
+
+sl-tab-panel {
+  --padding: 0 !important;
+}
+
+.info-text {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid black;
+  margin: 0rem 0rem 1rem 7rem;
+}
+
+.important {
+  border: 1px solid red;
+  color: red;
+}
+#TFA-checkbox {
+  color: red;
+}
+
+.vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.checkbox-input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+sl-alert.action {
+  --sl-color-primary-600: #004085; /* or your preferred color */
+  font-weight: bold;
+  background-color: #e7f1ff;
+  border-left: 4px solid var(--sl-color-primary-600);
+}
+
+sl-alert.info {
+  background-color: #f9f9f9;
+  border-left: 4px solid #ccc;
+}
+
+.two-column-grid {
+  padding: 1rem 0rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
+  gap: 0.5rem; /* spacing between columns and rows */
+}

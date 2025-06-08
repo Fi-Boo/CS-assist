@@ -51,7 +51,6 @@ const reasonsData = {
               {
                 label: "Debit Account",
                 value: "da"
-                
               },
             ],
           },
@@ -178,6 +177,7 @@ const reasonsData = {
       },
     },
   },
+  
 };
 
 const accountYesRadio = document.getElementById("accountYes");
