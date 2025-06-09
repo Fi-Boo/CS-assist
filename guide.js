@@ -9,7 +9,6 @@ const reasonsData = {
               {
                 id: "eligibilityCheck",
                 type: "radio-group",
-                label: "Payment Plan Eligibility Check",
                 questions: [
                   {
                     id: "q1",
@@ -21,20 +20,25 @@ const reasonsData = {
                     question: "Is there an existing Payment Plan in place?",
                     options: ["Yes", "No"],
                   },
+                  {
+                    id: "q3",
+                    question: "Is there a restriction in place?",
+                    options: ["Yes", "No"],
+                  },
                 ],
                 conditions: [
                   {
-                    if: { q1: "Yes", q2: "Yes" },
+                    if: { q1: "Yes", q3: "Yes" },
                     show: [
                       {
                         id: "warnApproval",
                         type: "warning",
-                        text: "AE/TL approval required if PP rqst is after next billing cycle or PP already exists",
+                        text: "** [L2] AE/TL approval required **",
                       },
                       {
                         id: "approvalInput",
                         type: "input",
-                        label: "Enter AE/TL Approver Name",
+                        label: "Enter AE/TL Approver >>",
                         placeholder: "AE name | TL name",
                         noteTemplate: "{input} approved.",
                       },
@@ -46,7 +50,6 @@ const reasonsData = {
                 id: "action1",
                 type: "action",
                 text: "Create PP via Function > Payment Plan",
-                note: "PP created in system.",
               },
               {
                 id: "vp1",
@@ -60,7 +63,26 @@ const reasonsData = {
                 label: "Payment Plan Summary",
                 placeholder: "Paste/Input PP details here",
                 buttonLabel: "Add",
-                noteTemplate: "{input}",
+                noteTemplate: "PP details:\n{input}\n",
+              },
+              {
+                id: "header1",
+                type: "header",
+                class: "subheader",
+                restriction: "checkbox-restriction",
+                header: "Action for Restriction?",
+              },
+              {
+                id: "restriction1",
+                type: "checkbox-conditional",
+                label: "Restriction removed",
+                note: "restriction removed - adv eu to pc cpe",
+              },
+              {
+                id: "restriction2",
+                type: "checkbox-conditional",
+                label: "Restriction NOT removed due to unpaid debt",
+                note: "adv eu restriction remains until further payment is made - eu to call back once payment made",
               },
             ],
           },
@@ -126,6 +148,9 @@ const copyDialog = document.querySelector("#clipboard-dialog");
 const refreshBtn = document.querySelector("#refresh-btn");
 
 const defaultNotes = `Customer: \nID: N\n2FA: N\nCall: Inbound\n-----\nNotes\n`; // default notes
+
+// Lower panel
+const optionsContainer = document.getElementById("option-buttons");
 
 resetNotes();
 
@@ -283,7 +308,6 @@ function renderTabs(data) {
 }
 
 function renderOptions(optionsObj) {
-  const optionsContainer = document.getElementById("option-buttons");
   optionsContainer.innerHTML = ""; // Clear previous options
 
   if (Object.keys(optionsObj).length === 0) {
@@ -298,7 +322,7 @@ function renderOptions(optionsObj) {
 
   let activeOptionBtn = null;
 
-  Object.keys(optionsObj).forEach((optionKey) => {
+  Object.entries(optionsObj).forEach(([optionKey, optionData]) => {
     const btn = document.createElement("sl-button");
     btn.innerText = optionKey;
     btn.variant = "default";
@@ -317,6 +341,7 @@ function renderOptions(optionsObj) {
 
       console.log(`Selected option: ${optionKey}`);
       // Future: Load steps or details into steps-content
+      renderSteps(optionKey, optionData);
     });
 
     flexContainer.appendChild(btn);
@@ -327,306 +352,376 @@ function renderOptions(optionsObj) {
 
 renderTabs(reasonsData);
 
-// function renderTabs(data, onOptionSelect) {
-//   Object.entries(data).forEach(([tabName, tabContent], index) => {
-//     const tab = document.createElement("sl-tab");
-//     tab.slot = "nav";
-//     tab.panel = `panel-${index}`;
-//     tab.innerText = tabName;
+const tabGroup = document.querySelector("#reasons-tabs");
 
-//     const panel = document.createElement("sl-tab-panel");
-//     panel.name = `panel-${index}`;
+tabGroup.addEventListener("sl-tab-show", (event) => {
+  // Clear any previously selected options
+  const optionsContainer = document.getElementById("option-buttons");
+  optionsContainer.innerHTML = "";
 
-//     const buttonContainer = document.createElement("div");
-//     buttonContainer.classList.add("vertical-stack");
+  // Also reset all subcategory button variants inside the new panel
+  const newPanelName = event.detail.name;
+  const newPanel = tabGroup.querySelector(
+    `sl-tab-panel[name="${newPanelName}"]`
+  );
 
-//     if (tabContent.suboptions) {
-//       Object.entries(tabContent.suboptions).forEach(([label, suboption]) => {
-//         const button = createButton(label, tabName, (cat, lbl) => {
-//           if (suboption.suboptions) {
-//             renderSuboptions(suboption.suboptions, lbl);
-//           } else {
-//             onOptionSelect(cat, lbl);
-//           }
-//         });
-//         buttonContainer.appendChild(button);
-//       });
-//     }
+  if (newPanel) {
+    const buttons = newPanel.querySelectorAll("sl-button");
+    buttons.forEach((btn) => {
+      btn.variant = "default";
+    });
+  }
+});
 
-//     panel.appendChild(buttonContainer);
-//     reasonsTabs.appendChild(tab);
-//     reasonsTabs.appendChild(panel);
-//   });
-// }
+function renderSteps(label, data) {
+  const stepsContent = document.getElementById("steps-content");
+  stepsContent.innerHTML = "";
 
-// function renderSuboptions(suboptions, parentLabel) {
-//   let subBtnContainer = document.getElementById("suboption-buttons");
-//   let stepsContent = document.getElementById("steps-content");
+  if (stepsContent.dataset.renderedFor === label) return;
 
-//   if (!subBtnContainer || !stepsContent) {
-//     stepsContainer.innerHTML = `
-//       <div id="suboption-buttons" class="horizontal-button-bar"></div>
-//       <div id="steps-content"></div>
-//     `;
-//     subBtnContainer = document.getElementById("suboption-buttons");
-//     stepsContent = document.getElementById("steps-content");
-//   }
+  const header = document.createElement("h3");
+  header.innerText = label;
+  stepsContent.appendChild(header);
 
-//   subBtnContainer.innerHTML = ""; // Clear previous buttons
-//   stepsContent.innerHTML = ""; // Clear previous steps (optional)
+  if (data.notes) {
+    const existing = notes.value.trim();
+    const noteToAdd = data.notes.trim();
+    notes.value =
+      existing + (existing.endsWith("\n") ? "" : "\n") + noteToAdd + "\n";
+  }
 
-//   Object.entries(suboptions).forEach(([subLabel, subData]) => {
-//     const subBtn = document.createElement("sl-button");
-//     subBtn.innerText = subLabel;
-//     subBtn.variant = "primary";
-//     subBtn.addEventListener("click", () => {
-//       renderSteps(subLabel, subData);
-//     });
-//     subBtnContainer.appendChild(subBtn);
-//   });
-// }
+  (data.steps || []).forEach((step) => {
+    const stepEl = document.createElement("div");
+    stepEl.classList.add("step");
 
-// function renderSteps(label, data) {
-//   const stepsContent = document.getElementById("steps-content");
-//   // 🛡️ Prevent double render of the same section
-//   stepsContent.dataset.renderedFor = label;
-//   stepsContent.innerHTML = "";
+    //const qAnswers = {}; // stores selected answers
 
-//   const header = document.createElement("h3");
-//   header.innerText = label;
-//   stepsContent.appendChild(header);
+    switch (step.type) {
+      case "header": {
+        const header = document.createElement("h2");
+        header.innerHTML = step.header;
+        header.className = step.class;
+        if (step.restriction) {
+          header.classList.add(step.restriction);
+          header.classList.add("hidden");
+        }
 
-//   if (data.notes) {
-//     const existing = notes.value.trim();
-//     const noteToAdd = data.notes.trim();
-//     notes.value =
-//       existing + (existing.endsWith("\n") ? "" : "\n") + noteToAdd + "\n";
-//   }
+        stepEl.appendChild(document.createElement("hr"));
+        stepEl.appendChild(header);
+        break;
+      }
+      case "info":
+      case "action": {
+        const content = document.createElement("sl-details");
+        content.disabled = step.type === "action" ? true : false;
+        content.className = step.type;
+        content.summary = step.text || "Update Text info for step";
+        stepEl.appendChild(content);
+        break;
+      }
 
-//   (data.steps || []).forEach((step) => {
-//     const stepEl = document.createElement("div");
-//     stepEl.classList.add("step");
+      case "warning": {
+        const alert = document.createElement("sl-alert");
+        alert.open = true;
+        alert.variant = step.type === "info" ? "primary" : "warning";
+        alert.innerText = step.text || "Instruction";
+        stepEl.appendChild(alert);
 
-//     switch (step.type) {
-//       case "action":
-//       case "info":
-//       case "warning": {
-//         const alert = document.createElement("sl-alert");
-//         alert.open = true;
-//         alert.variant = step.type === "action" ? "primary" : "warning";
-//         alert.innerText = step.text || "Instruction";
-//         stepEl.appendChild(alert);
+        // Add note if present
+        if (step.note) {
+          notes.value +=
+            (notes.value.endsWith("\n") ? "" : "\n") + step.note + "\n";
+        }
+        break;
+      }
 
-//         // Add note if present
-//         if (step.note) {
-//           notes.value +=
-//             (notes.value.endsWith("\n") ? "" : "\n") + step.note + "\n";
-//         }
-//         break;
-//       }
+      case "input": {
+        const textarea = document.createElement("sl-textarea");
+        textarea.placeholder = step.placeholder || "Enter details...";
+        textarea.rows = 4;
 
-//       case "input": {
-//         const textarea = document.createElement("sl-textarea");
-//         textarea.placeholder = step.placeholder || "Enter details...";
-//         textarea.rows = 4;
+        const addBtn = document.createElement("sl-button");
+        addBtn.innerText = "Add";
+        addBtn.variant = "primary";
 
-//         const addBtn = document.createElement("sl-button");
-//         addBtn.innerText = "Add";
-//         addBtn.variant = "primary";
+        addBtn.addEventListener("click", () => {
+          const inputVal = textarea.value.trim();
+          if (inputVal) {
+            const finalNote = step.noteTemplate
+              ? step.noteTemplate.replace("{input}", inputVal)
+              : inputVal;
 
-//         addBtn.addEventListener("click", () => {
-//           const inputVal = textarea.value.trim();
-//           if (inputVal) {
-//             const finalNote = step.noteTemplate
-//               ? step.noteTemplate.replace("{input}", inputVal)
-//               : inputVal;
+            notes.value +=
+              (notes.value.endsWith("\n") ? "" : "\n") + finalNote + "\n";
+          }
+        });
 
-//             notes.value +=
-//               (notes.value.endsWith("\n") ? "" : "\n") + finalNote + "\n";
-//           }
-//         });
+        stepEl.appendChild(textarea);
+        stepEl.appendChild(addBtn);
+        break;
+      }
 
-//         stepEl.appendChild(textarea);
-//         stepEl.appendChild(addBtn);
-//         break;
-//       }
+      case "input-confirm": {
+        // Create wrapper for vertical layout
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.flexDirection = "column";
+        wrapper.style.gap = "0.5rem"; // spacing between textarea and button
 
-//       case "input-confirm": {
-//         const input = document.createElement("sl-input");
-//         input.placeholder = step.placeholder || "Type something...";
-//         input.style.marginRight = "0.5rem";
+        // Create multiline textarea
+        const textarea = document.createElement("sl-textarea");
+        textarea.placeholder = step.placeholder || "Type something...";
+        textarea.rows = 4;
 
-//         const addBtn = document.createElement("sl-button");
-//         addBtn.innerText = step.buttonLabel || "Add";
-//         addBtn.variant = "success";
+        // Create Add button
+        const addBtn = document.createElement("sl-button");
+        addBtn.innerText = "Add PP Details";
+        addBtn.style.width = "fit-content";
+        addBtn.style.margin = "0 auto";
+        addBtn.variant = "success";
+        addBtn.size = "small";
 
-//         addBtn.addEventListener("click", () => {
-//           const inputVal = input.value.trim();
-//           if (inputVal) {
-//             const finalNote = step.noteTemplate
-//               ? step.noteTemplate.replace("{input}", inputVal)
-//               : inputVal;
+        // Add click handler
+        addBtn.addEventListener("click", () => {
+          const inputVal = textarea.value.trim();
+          if (inputVal) {
+            const finalNote = step.noteTemplate
+              ? step.noteTemplate.replace("{input}", inputVal)
+              : inputVal;
 
-//             notes.value +=
-//               (notes.value.endsWith("\n") ? "" : "\n") + finalNote + "\n";
-//           }
-//         });
+            notes.value +=
+              (notes.value.endsWith("\n") ? "" : "\n") + finalNote + "\n";
+          }
+        });
 
-//         stepEl.appendChild(input);
-//         stepEl.appendChild(addBtn);
-//         break;
-//       }
+        // Append elements in vertical order
+        wrapper.appendChild(textarea);
+        wrapper.appendChild(addBtn);
+        stepEl.appendChild(wrapper);
+        break;
+      }
 
-//       case "checkbox": {
-//         const checkbox = document.createElement("sl-checkbox");
-//         checkbox.innerText = step.label;
+      case "checkbox-conditional":
+      case "checkbox": {
+        // const checkbox = document.createElement("sl-checkbox");
+        // checkbox.innerText = step.label;
 
-//         let conditionalInput;
-//         if (step.conditionalInput) {
-//           conditionalInput = document.createElement("sl-input");
-//           conditionalInput.placeholder = step.conditionalInput.placeholder;
-//           conditionalInput.classList.add("hidden");
-//           conditionalInput.style.marginLeft = "1rem";
-//         }
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.justifyContent = "space-between";
+        wrapper.style.alignItems = "center";
+        wrapper.style.paddingRight = "5rem";
+        if (step.type === "checkbox-conditional") {
+          wrapper.classList.add("checkbox-restriction");
+          wrapper.classList.add("hidden");
+        }
 
-//         checkbox.addEventListener("sl-change", (e) => {
-//           const checked = e.target.checked;
-//           const noteText = step.note;
+        const label = document.createElement("label");
+        label.innerText = step.label;
+        label.style.flexGrow = "1"; // <-- this makes label take remaining space
+        label.style.marginRight = "1rem"; // spacing between label and checkbox
+        label.style.userSelect = "none"; // optional: prevent label text selection on checkbox click
+        const checkbox = document.createElement("sl-checkbox");
 
-//           if (checked && noteText && !notes.value.includes(noteText)) {
-//             notes.value +=
-//               (notes.value.endsWith("\n") ? "" : "\n") + noteText + "\n";
-//           } else if (!checked && noteText) {
-//             notes.value =
-//               notes.value
-//                 .split("\n")
-//                 .filter((line) => line !== noteText)
-//                 .join("\n")
-//                 .trim() + "\n";
-//           }
+        let conditionalInput;
+        if (step.conditionalInput) {
+          conditionalInput = document.createElement("sl-input");
+          conditionalInput.placeholder = step.conditionalInput.placeholder;
+          conditionalInput.classList.add("hidden");
+          conditionalInput.style.marginLeft = "1rem";
+        }
 
-//           if (conditionalInput) {
-//             conditionalInput.classList.toggle("hidden", !checked);
+        checkbox.addEventListener("sl-change", (e) => {
+          const checked = e.target.checked;
+          const noteText = step.note;
 
-//             conditionalInput.addEventListener("input", () => {
-//               const inputVal = conditionalInput.value.trim();
-//               const template = step.conditionalInput.noteTemplate;
-//               const finalNote = template.replace("{input}", inputVal);
+          if (checked && noteText && !notes.value.includes(noteText)) {
+            notes.value +=
+              (notes.value.endsWith("\n") ? "" : "\n") + noteText + "\n";
+          } else if (!checked && noteText) {
+            notes.value =
+              notes.value
+                .split("\n")
+                .filter((line) => line !== noteText)
+                .join("\n")
+                .trim() + "\n";
+          }
 
-//               // Replace any existing approval lines
-//               notes.value = notes.value
-//                 .split("\n")
-//                 .filter((line) => !line.includes("approved."))
-//                 .join("\n")
-//                 .trim();
+          if (conditionalInput) {
+            conditionalInput.classList.toggle("hidden", !checked);
 
-//               if (inputVal) {
-//                 notes.value += "\n" + finalNote + "\n";
-//               }
-//             });
-//           }
-//         });
+            conditionalInput.addEventListener("input", () => {
+              const inputVal = conditionalInput.value.trim();
+              const template = step.conditionalInput.noteTemplate;
+              const finalNote = template.replace("{input}", inputVal);
 
-//         stepEl.appendChild(checkbox);
-//         if (conditionalInput) stepEl.appendChild(conditionalInput);
-//         break;
-//       }
+              // Replace any existing approval lines
+              notes.value = notes.value
+                .split("\n")
+                .filter((line) => !line.includes("approved."))
+                .join("\n")
+                .trim();
 
-//       case "radio-group": {
-//         const groupWrapper = document.createElement("div");
+              if (inputVal) {
+                notes.value += "\n" + finalNote + "\n";
+              }
+            });
+          }
+        });
 
-//         const groupLabel = document.createElement("label");
-//         groupLabel.innerText = step.label;
-//         groupWrapper.appendChild(groupLabel);
+        wrapper.appendChild(label);
+        wrapper.appendChild(checkbox);
+        stepEl.appendChild(wrapper);
 
-//         const qAnswers = {};
-//         step.questions.forEach((q) => {
-//           const questionLabel = document.createElement("label");
-//           questionLabel.innerText = q.question;
-//           questionLabel.style.display = "block";
-//           if (groupWrapper.querySelector(`sl-radio-group[name="${q.id}"]`))
-//             return;
-//           groupWrapper.appendChild(questionLabel);
+        //stepEl.appendChild(checkbox);
+        if (conditionalInput) stepEl.appendChild(conditionalInput);
+        break;
+      }
 
-//           const radioGroup = document.createElement("sl-radio-group");
-//           radioGroup.setAttribute("label", q.question);
-//           radioGroup.setAttribute("name", q.id); // <-- ensures isolation
+      case "radio-group": {
+        const groupWrapper = document.createElement("div");
 
-//           q.options.forEach((opt) => {
-//             const radio = document.createElement("sl-radio");
-//             radio.value = opt;
-//             radio.innerText = opt;
-//             radioGroup.appendChild(radio);
-//           });
+        const qAnswers = {}; // stores selected answers
 
-//           groupWrapper.appendChild(radioGroup);
+        step.questions.forEach((q) => {
+          // Create a flex container for question + radios
+          const flexWrapper = document.createElement("div");
+          flexWrapper.style.display = "flex";
+          flexWrapper.style.justifyContent = "space-between";
+          flexWrapper.style.alignItems = "center";
+          flexWrapper.style.marginBottom = "1rem";
 
-//           radioGroup.addEventListener("sl-change", (e) => {
-//             qAnswers[q.id] = e.target.value;
-//             evaluateConditions();
-//           });
-//         });
+          // Question label
+          const questionLabel = document.createElement("label");
+          //questionLabel.style.minWidth = "150px"; // optional fixed width or adjust as needed
+          //questionLabel.style.margin = "0"; // remove default margin
+          questionLabel.innerText = q.question;
 
-//         const dynamicContainer = document.createElement("div");
-//         groupWrapper.appendChild(dynamicContainer);
+          // Radio group
+          const radioGroup = document.createElement("sl-radio-group");
+          radioGroup.setAttribute("name", q.id);
+          radioGroup.setAttribute("size", "small");
 
-//         function evaluateConditions() {
-//           dynamicContainer.innerHTML = "";
-//           step.conditions?.forEach((cond) => {
-//             const allMatch = Object.entries(cond.if).every(
-//               ([qid, val]) => qAnswers[qid] === val
-//             );
+          q.options.forEach((opt) => {
+            const radioBtn = document.createElement("sl-radio-button");
+            radioBtn.setAttribute("value", opt);
+            radioBtn.innerText = opt;
+            radioGroup.appendChild(radioBtn);
+          });
 
-//             if (allMatch) {
-//               cond.show.forEach((showStep) => {
-//                 const container = document.createElement("div");
+          // Append label and radio group to flex container
+          flexWrapper.appendChild(questionLabel);
+          flexWrapper.appendChild(radioGroup);
 
-//                 if (showStep.type === "warning") {
-//                   const alert = document.createElement("sl-alert");
-//                   alert.open = true;
-//                   alert.variant = "warning";
-//                   alert.innerText = showStep.text;
-//                   container.appendChild(alert);
-//                 }
+          // Append flex container to the main groupWrapper
+          groupWrapper.appendChild(flexWrapper);
 
-//                 if (showStep.type === "input") {
-//                   const input = document.createElement("sl-input");
-//                   input.placeholder = showStep.placeholder || "";
-//                   input.addEventListener("input", () => {
-//                     const inputVal = input.value.trim();
-//                     const finalNote = showStep.noteTemplate.replace(
-//                       "{input}",
-//                       inputVal
-//                     );
-//                     notes.value = notes.value
-//                       .split("\n")
-//                       .filter((line) => !line.includes("approved."))
-//                       .join("\n")
-//                       .trim();
+          // Add event listener
+          radioGroup.addEventListener("sl-change", (e) => {
+            qAnswers[q.id] = e.target.value;
+            evaluateConditions();
+          });
+        });
 
-//                     if (inputVal) {
-//                       notes.value += "\n" + finalNote + "\n";
-//                     }
-//                   });
-//                   container.appendChild(input);
-//                 }
+        const dynamicContainer = document.createElement("div");
+        groupWrapper.appendChild(dynamicContainer);
 
-//                 dynamicContainer.appendChild(container);
-//               });
-//             }
-//           });
-//         }
+        function evaluateConditions() {
+          dynamicContainer.innerHTML = "";
+          step.conditions?.forEach((cond) => {
+            // const allMatch = Object.entries(cond.if).every(
+            //   ([qid, val]) => qAnswers[qid] === val
+            // );
+            const allMatch =
+              qAnswers.q1 === "Yes" ||
+              (qAnswers.q2 === "Yes" && qAnswers.q3 === "Yes");
 
-//         stepEl.appendChild(groupWrapper);
-//         break;
-//       }
+            if (allMatch) {
+              cond.show.forEach((showStep) => {
+                const container = document.createElement("div");
 
-//       default:
-//         console.warn("Unsupported step type:", step.type);
-//     }
+                if (showStep.type === "warning") {
+                  const alert = document.createElement("sl-alert");
+                  alert.open = true;
+                  alert.variant = "warning";
+                  alert.innerText = showStep.text;
+                  container.appendChild(alert);
+                }
 
-//     stepsContent.appendChild(stepEl);
-//   });
-// }
+                if (showStep.type === "input") {
+                  // Create a wrapper div for label + input, styled as flex row
+                  const row = document.createElement("div");
+                  row.style.display = "flex";
+                  row.style.alignItems = "center";
+                  row.style.gap = "0.5rem"; // spacing between label and input
+                  row.style.justifyContent= "flex-end";
 
-//renderTabs(reasonsData, renderSteps);
+                  // Create the label
+                  const label = document.createElement("label");
+                  label.innerText = showStep.label || "";
+                  label.style.minWidth = "150px"; // fixed width for alignment, adjust as needed
+                  label.style.display = "inline-block";
+
+                  // Create the input
+                  const input = document.createElement("sl-input");
+                  input.placeholder = showStep.placeholder || "";
+
+                  input.addEventListener("input", () => {
+                    const inputVal = input.value.trim();
+                    const finalNote = showStep.noteTemplate.replace(
+                      "{input}",
+                      inputVal
+                    );
+
+                    notes.value = notes.value
+                      .split("\n")
+                      .filter((line) => !line.includes("approved."))
+                      .join("\n")
+                      .trim();
+
+                    if (inputVal) {
+                      notes.value += "\n" + finalNote + "\n";
+                    }
+                  });
+
+                  // Append label and input side by side inside row
+                  row.appendChild(label);
+                  row.appendChild(input);
+
+                  // Append the row to the container
+                  container.appendChild(row);
+                }
+
+                dynamicContainer.appendChild(container);
+              });
+            }
+
+            const checkBoxRestriction = document.querySelectorAll(
+              ".checkbox-restriction"
+            );
+
+            if (qAnswers.q3 === "Yes") {
+              checkBoxRestriction.forEach((el) => {
+                el.classList.remove("hidden");
+              });
+            } else {
+              {
+                checkBoxRestriction.forEach((el) => {
+                  el.classList.add("hidden");
+                });
+              }
+            }
+          });
+        }
+
+        stepEl.appendChild(groupWrapper);
+        break;
+      }
+
+      default:
+        console.warn("Unsupported step type:", step.type);
+    }
+
+    stepsContent.appendChild(stepEl);
+  });
+}

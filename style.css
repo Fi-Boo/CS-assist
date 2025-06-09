@@ -35,7 +35,6 @@ body {
 
 #top-half {
   display: flex;
-  flex: 1;
   gap: 1rem;
 }
 
@@ -89,7 +88,7 @@ body {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .inline-radio {
@@ -181,8 +180,56 @@ sl-alert.info {
 .option-buttons-row {
   display: flex;
   gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid black;
+  margin-bottom: 1rem;
 }
 
 .options-btn {
   width: 10rem;
+}
+
+
+sl-alert::part(message) {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+sl-checkbox {
+  margin: 0.5rem auto;
+}
+
+.step {
+  text-align: center;
+}
+
+/* Style for .info sl-details */
+sl-details.info::part(base) {
+  border-left: 4px solid #1976d2;
+  background-color: #e3f2fd;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+sl-details.info::part(summary) {
+  font-weight: bold;
+  color: #0d47a1;
+}
+
+/* Style for .action sl-details */
+sl-details.action::part(base) {
+  border-left: 4px solid var(--sl-color-primary-800);
+  background-color: var(--sl-color-primary-50);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+sl-details.action::part(summary) {
+  font-weight: bold;
+  opacity: 1 !important;
+}
+
+hr {
+  margin: 0.5rem 0;
 }
