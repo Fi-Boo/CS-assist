@@ -70,7 +70,7 @@ const reasonsData = {
                 type: "header",
                 class: "subheader",
                 restriction: "checkbox-restriction",
-                header: "Action for Restriction?",
+                header: "Actioning Restriction?",
               },
               {
                 id: "restriction1",
