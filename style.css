@@ -1,5 +1,5 @@
 :root {
-  --sl-color-primary-50:  #e6f4e9;
+  --sl-color-primary-50: #e6f4e9;
   --sl-color-primary-100: #c2e4c7;
   --sl-color-primary-200: #9fd4a4;
   --sl-color-primary-300: #7ac47f;
@@ -35,7 +35,11 @@ body {
 
 #top-half {
   display: flex;
+  position: sticky;
+  top: 0;
   gap: 1rem;
+  background: grey;
+  z-index: 100;
 }
 
 #top-left {
@@ -43,7 +47,7 @@ body {
   padding: 1rem 1rem 0rem;
   border: 1px solid black;
   border-radius: 0.5rem;
-  background :#fff;
+  background: #fff;
 }
 
 #reason-container {
@@ -55,7 +59,7 @@ body {
   padding: 1rem 0.5rem 0rem;
   border: 1px solid black;
   border-radius: 0.5rem;
-  background :#fff;
+  background: #fff;
 }
 
 #notes-area {
@@ -70,7 +74,8 @@ body {
   padding: 1rem;
   border: 1px solid black;
   border-radius: 0.5rem;
-  background :#fff;
+  background: #fff;
+  overflow-y: scroll;
 }
 
 #split-container {
@@ -185,10 +190,14 @@ sl-alert.info {
   margin-bottom: 0.5rem;
 }
 
+#option-buttons {
+  position: sticky;
+  top: 0;
+}
+
 .options-btn {
   width: 10rem;
 }
-
 
 sl-alert::part(message) {
   color: red;
