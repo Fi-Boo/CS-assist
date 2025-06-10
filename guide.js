@@ -5,6 +5,7 @@ const reasonsData = {
         options: {
           "Payment Plan": {
             notes: "-----\nPayment Plan",
+            img: "img/PP-flow.png",
             steps: [
               {
                 id: "eligibilityCheck",
@@ -12,23 +13,23 @@ const reasonsData = {
                 questions: [
                   {
                     id: "q1",
-                    question: "Is Payment Plan Rqst after Billing Cycle?",
+                    question: "Is PP within billing cycle?",
                     options: ["Yes", "No"],
                   },
                   {
                     id: "q2",
-                    question: "Is there an existing Payment Plan in place?",
+                    question: "Is there a restriction active?",
                     options: ["Yes", "No"],
                   },
                   {
                     id: "q3",
-                    question: "Is there a restriction in place?",
+                    question: "Is there a PP already active?",
                     options: ["Yes", "No"],
                   },
                 ],
                 conditions: [
                   {
-                    if: { q1: "Yes", q3: "Yes" },
+                    if: { q1: "No", q3: "Yes" },
                     show: [
                       {
                         id: "warnApproval",
@@ -151,6 +152,8 @@ const defaultNotes = `Customer: \nID: N\n2FA: N\nCall: Inbound\n-----\nNotes\n`;
 
 // Lower panel
 const optionsContainer = document.getElementById("option-buttons");
+const stepsContent = document.getElementById("steps-content");
+const decisionTreeContainer = document.getElementById("decisionTree");
 
 resetNotes();
 
@@ -280,7 +283,7 @@ function renderTabs(data) {
         ([subCatName, subCatData]) => {
           const button = document.createElement("sl-button");
           button.innerText = subCatName;
-          button.size = "medium";
+          button.size = "small";
           button.variant = "default"; // inactive state
 
           button.addEventListener("click", () => {
@@ -356,9 +359,9 @@ const tabGroup = document.querySelector("#reasons-tabs");
 
 tabGroup.addEventListener("sl-tab-show", (event) => {
   // Clear any previously selected options
-  const optionsContainer = document.getElementById("option-buttons");
   optionsContainer.innerHTML = "";
-
+  stepsContent.innerHTML ="";
+  decisionTreeContainer.innerHTML ="";
   // Also reset all subcategory button variants inside the new panel
   const newPanelName = event.detail.name;
   const newPanel = tabGroup.querySelector(
@@ -374,7 +377,7 @@ tabGroup.addEventListener("sl-tab-show", (event) => {
 });
 
 function renderSteps(label, data) {
-  const stepsContent = document.getElementById("steps-content");
+  
   stepsContent.innerHTML = "";
 
   if (stepsContent.dataset.renderedFor === label) return;
@@ -388,6 +391,19 @@ function renderSteps(label, data) {
     const noteToAdd = data.notes.trim();
     notes.value =
       existing + (existing.endsWith("\n") ? "" : "\n") + noteToAdd + "\n";
+  }
+
+  
+  decisionTreeContainer.innerHTML = ""; // Clear previous image
+
+  if (data.img) {
+    const imgEl = document.createElement("img");
+    imgEl.src = data.img;
+    imgEl.alt = label + " Decision Tree";
+    imgEl.style.maxWidth = "100%"; // Make it responsive
+    imgEl.style.marginBottom = "1rem";
+
+    decisionTreeContainer.appendChild(imgEl);
   }
 
   (data.steps || []).forEach((step) => {
@@ -589,7 +605,7 @@ function renderSteps(label, data) {
           flexWrapper.style.display = "flex";
           flexWrapper.style.justifyContent = "space-between";
           flexWrapper.style.alignItems = "center";
-          flexWrapper.style.marginBottom = "1rem";
+          flexWrapper.style.marginBottom = "0.5rem";
 
           // Question label
           const questionLabel = document.createElement("label");
@@ -632,9 +648,7 @@ function renderSteps(label, data) {
             // const allMatch = Object.entries(cond.if).every(
             //   ([qid, val]) => qAnswers[qid] === val
             // );
-            const allMatch =
-              qAnswers.q1 === "Yes" ||
-              (qAnswers.q2 === "Yes" && qAnswers.q3 === "Yes");
+            const allMatch = qAnswers.q1 === "No" || qAnswers.q2 === "Yes" || qAnswers.q3 === "Yes";
 
             if (allMatch) {
               cond.show.forEach((showStep) => {
@@ -654,7 +668,7 @@ function renderSteps(label, data) {
                   row.style.display = "flex";
                   row.style.alignItems = "center";
                   row.style.gap = "0.5rem"; // spacing between label and input
-                  row.style.justifyContent= "flex-end";
+                  row.style.justifyContent = "flex-end";
 
                   // Create the label
                   const label = document.createElement("label");
@@ -700,7 +714,7 @@ function renderSteps(label, data) {
               ".checkbox-restriction"
             );
 
-            if (qAnswers.q3 === "Yes") {
+            if (qAnswers.q2 === "Yes") {
               checkBoxRestriction.forEach((el) => {
                 el.classList.remove("hidden");
               });
