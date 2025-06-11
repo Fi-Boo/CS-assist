@@ -75,7 +75,7 @@ body {
   border: 1px solid black;
   border-radius: 0.5rem;
   background: #fff;
-  overflow-y: scroll;
+  
 }
 
 #split-container {
@@ -193,6 +193,8 @@ sl-alert.info {
 #option-buttons {
   position: sticky;
   top: 0;
+  background: #fff;
+  z-index: 50;
 }
 
 .options-btn {

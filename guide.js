@@ -148,7 +148,7 @@ const copyNotesBtn = document.querySelector("#copy-notes-btn"); // copy to notes
 const copyDialog = document.querySelector("#clipboard-dialog");
 const refreshBtn = document.querySelector("#refresh-btn");
 
-const defaultNotes = `Customer: \nID: N\n2FA: N\nCall: Inbound\n-----\nNotes\n`; // default notes
+const defaultNotes = `Customer: \nID: N\n2FA: N\nCall: \n-----\nNotes\n`; // default notes
 
 // Lower panel
 const optionsContainer = document.getElementById("option-buttons");
@@ -205,7 +205,7 @@ function getDynamicHeader() {
     callTypeValue = "Out (adv eu of recording)";
   }
 
-  return `Customer: ${customerName}\nID: ${idConfirmed}\n2FA: ${tfaConfirmed}\nCall: ${callTypeValue}\n------\nNotes\n`;
+  return `Customer: ${customerName}\nID: ${idConfirmed}\n2FA: ${tfaConfirmed}\nCall: ${callTypeValue}\n-----\nNotes`;
 }
 
 function updateNotesHeaderOnly() {
@@ -213,7 +213,7 @@ function updateNotesHeaderOnly() {
   const newHeader = getDynamicHeader().split("\n");
   let userNotes = "";
 
-  if (current.length > 6) {
+  if (current.length >= 6) {
     userNotes = current.slice(6).join("\n").trim();
   }
   notes.value = [...newHeader, userNotes].join("\n");
