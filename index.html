@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/shoelace-autoloader.js"
+    ></script>
+
+    <link rel="stylesheet" href="styles.css" />
+    <title>Guide v1</title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="top-half">
+        <div id="top-left">
+          <h2>RES Customer Support ( 1300 880 905 )</h2>
+          <!-- <div class="form-row">
+            <label for="caller-cms">Caller CMS found?</label>
+            <sl-radio-group size="small" name="CMSfound" id="caller-cms">
+              <sl-radio-button value="1">Yes</sl-radio-button>
+              <sl-radio-button value="2">No</sl-radio-button>
+            </sl-radio-group>
+          </div>
+          <div id="CMSmissing" class="info-text hidden">
+            <p>a) Ask for Account# or registered mobile number</p>
+            <p>b) Search via top-left search bar in CMS.</p>
+            <p>c) Proceed with ID confirmation.</p>
+          </div> -->
+
+          <div class="form-row">
+            <label for="customerName-input">Customer Name</label>
+            <sl-input
+              id="customerName-input"
+              placeholder="Input Customer Name Here"
+            ></sl-input>
+          </div>
+
+          <div class="form-row">
+            <label for="caller-class">Caller Class</label>
+            <sl-radio-group size="small" name="callClass" id="caller-class">
+              <sl-radio-button value="1">Primary</sl-radio-button>
+              <sl-radio-button value="2">Secondary</sl-radio-button>
+            </sl-radio-group>
+          </div>
+
+          <div class="form-row">
+            <div class="form-row">
+              <label for="ID-checkbox">Identified</label>
+              <sl-checkbox id="ID-checkbox"></sl-checkbox>
+            </div>
+
+            <div class="form-row form-2fa">
+              <label for="TFA-checkbox">2FA</label>
+              <sl-checkbox id="TFA-checkbox"></sl-checkbox>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="caller-type">Call Type</label>
+            <sl-radio-group size="small" name="callType" id="caller-type">
+              <sl-radio-button value="1">Inbound</sl-radio-button>
+              <sl-radio-button value="2">Outbound</sl-radio-button>
+            </sl-radio-group>
+          </div>
+          <div id="callPrompt" class="info-text important hidden">
+            <p>
+              <strong>MUST SAY:</strong> This call is recorded for training and
+              quality purposes <br />
+              <strong>MUST 2FA!</strong> If eu refuses to 2FA, adv eu to call
+              1300 880 905
+            </p>
+          </div>
+
+          <hr />
+
+          <sl-tab-group id="reasons-tabs"></sl-tab-group>
+
+          <sl-dialog label="Notice" id="clipboard-dialog">
+            <p>Copied notes to clipboard!</p>
+            <sl-button slot="footer" variant="primary" id="refresh-btn"
+              >Refresh</sl-button
+            >
+          </sl-dialog>
+        </div>
+
+        <div id="top-right">
+          <h2>Notes</h2>
+          <textarea id="notes-area" spellcheck="false"> </textarea>
+          <sl-button id="copy-notes-btn" variant="primary"
+            >Copy Notes to Clipboard</sl-button
+          >
+        </div>
+      </div>
+      <div id="steps-container">
+        <div id="option-buttons"></div>
+        <div id="split-container">
+          <div id="steps-content"></div>
+          <div id="decisionTree"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+:root {
+  --sl-color-primary-50: #e6f4e9;
+  --sl-color-primary-100: #c2e4c7;
+  --sl-color-primary-200: #9fd4a4;
+  --sl-color-primary-300: #7ac47f;
+  --sl-color-primary-400: #56b45c;
+  --sl-color-primary-500: #349d42;
+  --sl-color-primary-600: #1e7d30;
+  --sl-color-primary-700: #136527;
+  --sl-color-primary-800: #0c4b1b;
+  --sl-color-primary-900: #072f11;
+}
+* {
+  box-sizing: border-box !important;
+  padding: 0 ;
+  margin: 0 ;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  background: grey;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+#top-half {
+  display: flex;
+  position: sticky;
+  top: 0;
+  gap: 1rem;
+  background: grey;
+  z-index: 100;
+}
+
+#top-left {
+  flex: 11;
+  padding: 1rem 1rem 0rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+#top-left h2 {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+#reason-container {
+  text-align: center;
+}
+
+#top-right {
+  flex: 9;
+  padding: 1rem 0.5rem 0rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+#notes-area {
+  width: 100%;
+  height: 85%;
+  padding: 1rem;
+  overflow-y: scroll;
+}
+
+#steps-container {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  background: #fff;
+  
+}
+
+#split-container {
+  display: flex;
+  height: 100%;
+}
+
+#steps-content {
+  flex: 11;
+  padding: 0rem 0.5rem;
+}
+
+#decisionTree {
+  flex: 9;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.inline-radio {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+
+.form-row label {
+  width: 150px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.form-2fa label {
+  width: 125px;
+}
+
+.form-row sl-input,
+.form-row sl-radio-group,
+.form-row sl-checkbox {
+  flex: 1;
+}
+
+sl-radio-group::part(base) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+sl-radio-button::part(button) {
+  min-width: 100px;
+  text-align: center;
+}
+
+sl-tab-panel {
+  --padding: 0 !important;
+}
+
+.info-text {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid black;
+  margin: 0rem 0rem 1rem 7rem;
+}
+
+.important {
+  border: 1px solid red;
+  color: red;
+}
+#TFA-checkbox {
+  color: red;
+}
+
+.vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.checkbox-input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+sl-alert.action {
+  --sl-color-primary-600: #004085; /* or your preferred color */
+  font-weight: bold;
+  background-color: #e7f1ff;
+  border-left: 4px solid var(--sl-color-primary-600);
+}
+
+sl-alert.info {
+  background-color: #f9f9f9;
+  border-left: 4px solid #ccc;
+}
+
+.two-column-grid {
+  padding: 1rem 0rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
+  gap: 0.5rem; /* spacing between columns and rows */
+}
+
+.option-buttons-row {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid black;
+  margin-bottom: 0.5rem;
+}
+
+#option-buttons {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 50;
+}
+
+.options-btn {
+  width: 10rem;
+}
+
+sl-alert::part(message) {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+sl-checkbox {
+  margin: 0.5rem auto;
+}
+
+.step {
+  text-align: center;
+}
+
+/* Style for .info sl-details */
+sl-details.info::part(base) {
+  border-left: 4px solid #1976d2;
+  background-color: #e3f2fd;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+sl-details.info::part(summary) {
+  font-weight: bold;
+  color: #0d47a1;
+}
+
+/* Style for .action sl-details */
+sl-details.action::part(base) {
+  border-left: 4px solid var(--sl-color-primary-800);
+  background-color: var(--sl-color-primary-50);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+sl-details.action::part(summary) {
+  font-weight: bold;
+  opacity: 1 !important;
+}
+
+hr {
+  margin: 0.5rem 0;
+}
