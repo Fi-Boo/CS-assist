@@ -1,158 +1,165 @@
 import { Renderer } from "./renderer.js";
 
 const reasonsData = {
-  Accounts: {
-    subCategories: {
-      "Billing Issues/Enquiry": {
-        options: {
-          "Payment Plan": {
-            notes: "-----\nPayment Plan",
-            img: "img/PP-flow.png",
-            steps: [
-              {
-                id: "ppReason",
-                type: "input",
-                placeholder: "Input reason for PP here",
-                noteTemplate: "PP Reason: {input}",
-              },
-              {
-                id: "eligibilityCheck",
-                type: "conditional",
-                questions: [
-                  {
-                    id: "q1",
-                    type: "radio",
-                    label: "Is PP outside of billing cycle?",
-                    options: ["Yes", "No"],
-                  },
-                  {
-                    id: "q2",
-                    type: "radio",
-                    label: "Is there a restriction active?",
-                    options: ["Yes", "No"],
-                  },
-                  {
-                    id: "q3",
-                    type: "radio",
-                    label: "Is there a PP already active?",
-                    options: ["Yes", "No"],
-                  },
-                ],
-                conditions: [
-                  {
-                    if: [{ q1: "Yes" }, { q3: "Yes" }],
-                    logic: "OR",
-                    show: [
-                      {
-                        id: "warningApproval",
-                        type: "warning",
-                        text: "** [L2] AE/TL approval required **",
-                      },
-                      {
-                        id: "approval",
-                        type: "input",
-                        placeholder: "Input AE/TL Approver Name Here",
-                        noteTemplate: "Approved by: {input}",
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: "action1",
-                type: "action",
-                text: "Create PP via Function > Payment Plan",
-              },
-              {
-                id: "vp1",
-                type: "checkbox",
-                label: "User acknowledged Voice Print",
-                note: "eu ack vp",
-              },
-              {
-                id: "ppSummary",
-                type: "input-confirm",
-                placeholder: "Paste/Input PP details here",
-                buttonLabel: "Add",
-                noteTemplate: "PP details:\n{input}\n-x-\n",
-              },
-              {
-                id: "restrictionResult",
-                type: "conditional",
-                conditions: [
-                  {
-                    if: [{ q3: "Yes" }],
-                    show: [
-                      {
-                        id: "header1",
-                        type: "header",
-                        class: "subheader",
-                        header: "Actioning Restriction?",
-                      },
-                      {
-                        id: "checkbox-1",
-                        type: "checkbox",
-                        label: "Restriction removed.",
-                        note: "Restriction removed. Adv eu to pc CPE if required",
-                         exclusiveWith: ["checkbox-2"]
-                      },
-                      {
-                        id: "checkbox-2",
-                        type: "checkbox",
-                        label: "Restriction NOT removed.",
-                        note: "Restriction NOT removed",
-                        exclusiveWith: ["checkbox-1"]
-                      },
-                      {
-                        id: "restrictionReason",
-                        type: "input",
-                        placeholder: "Input reason (for non removal)",
-                        noteTemplate: "Reason: {input}",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
+  type: "tabs",
+  target: "#reasons-tabs",
+  categories: {
+    Accounts: {
+      type: "btn-selection",
+      target:"option-buttons",
+      subCategories: {
+        "Billing Issues/Enquiry": {
+          options: {
+            "Payment Plan": {
+              notes: "-----\nPayment Plan",
+              img: "img/PP-flow.png",
+              steps: [
+                {
+                  id: "ppReason",
+                  type: "input",
+                  placeholder: "Input reason for PP here",
+                  noteTemplate: "PP Reason: {input}",
+                },
+                {
+                  id: "eligibilityCheck",
+                  type: "conditional",
+                  questions: [
+                    {
+                      id: "q1",
+                      type: "radio",
+                      label: "Is PP outside of billing cycle?",
+                      options: ["Yes", "No"],
+                    },
+                    {
+                      id: "q2",
+                      type: "radio",
+                      label: "Is there a restriction active?",
+                      options: ["Yes", "No"],
+                    },
+                    {
+                      id: "q3",
+                      type: "radio",
+                      label: "Is there a PP already active?",
+                      options: ["Yes", "No"],
+                    },
+                  ],
+                  conditions: [
+                    {
+                      if: [{ q1: "Yes" }, { q3: "Yes" }],
+                      logic: "OR",
+                      show: [
+                        {
+                          id: "warningApproval",
+                          type: "warning",
+                          text: "** [L2] AE/TL approval required **",
+                        },
+                        {
+                          id: "approval",
+                          type: "input",
+                          placeholder: "Input AE/TL Approver Name Here",
+                          noteTemplate: "Approved by: {input}",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  id: "action1",
+                  type: "action",
+                  text: "Create PP via Function > Payment Plan",
+                },
+                {
+                  id: "vp1",
+                  type: "checkbox",
+                  label: "User acknowledged Voice Print",
+                  note: "eu ack vp",
+                },
+                {
+                  id: "ppSummary",
+                  type: "input-confirm",
+                  placeholder: "Paste/Input PP details here",
+                  buttonLabel: "Add",
+                  noteTemplate: "PP details:\n{input}\n-x-\n",
+                },
+                {
+                  id: "restrictionResult",
+                  type: "conditional",
+                  conditions: [
+                    {
+                      if: [{ q3: "Yes" }],
+                      show: [
+                        {
+                          id: "header1",
+                          type: "header",
+                          class: "subheader",
+                          header: "Actioning Restriction?",
+                        },
+                        {
+                          id: "checkbox-1",
+                          type: "checkbox",
+                          label: "Restriction removed.",
+                          note: "Restriction removed. Adv eu to pc CPE if required",
+                          exclusiveWith: ["checkbox-2"],
+                        },
+                        {
+                          id: "checkbox-2",
+                          type: "checkbox",
+                          label: "Restriction NOT removed.",
+                          note: "Restriction NOT removed",
+                          exclusiveWith: ["checkbox-1"],
+                        },
+                        {
+                          id: "restrictionReason",
+                          type: "input",
+                          placeholder: "Input reason (for non removal)",
+                          noteTemplate: "Reason: {input}",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "Immediate Payment": {
+              notes: "-----\nImmediate Plan",
+              steps: [],
+            },
+            "Once Off Payment": {},
           },
-          "Immediate Payment": {
-            notes: "-----\nImmediate Plan",
-            steps: [],
+        },
+        "Transfer of Ownership (ToO)": {},
+        "Edit/Update Details": {},
+        "Service Closure": {},
+        "Add Secondary Contact": {},
+        Complaint: {},
+        "Plan Speed Change": {},
+      },
+    },
+
+    Technical: {
+      subCategories: {
+        NBN: {
+          options: {
+            FTTP: {},
+            "FTTN/B": {},
+            FTTC: {},
+            HFC: {},
+            "F/W": {},
           },
-          "Once Off Payment": {},
         },
+        Opticomm: {},
+        VOIP: {},
+        Mobile: {},
+        Fetch: {},
+        Email: {},
+        "Router/WiFi Config": {},
       },
-      "Transfer of Ownership (ToO)": {},
-      "Edit/Update Details": {},
-      "Service Closure": {},
-      "Add Secondary Contact": {},
-      Complaint: {},
-      "Plan Speed Change": {},
     },
-  },
-  Technical: {
-    subCategories: {
-      NBN: {
-        options: {
-          FTTP: {},
-          "FTTN/B": {},
-          FTTC: {},
-          HFC: {},
-          "F/W": {},
-        },
+    Provisioning: {
+      subCategories: {
+        "Coming soon to a": {},
+        "Cinema near YOU!": {},
       },
-      Opticomm: {},
-      VOIP: {},
-      Mobile: {},
-      Fetch: {},
-      Email: {},
-      "Router/WiFi Config": {},
-    },
-  },
-  Provisioning: {
-    subCategories: {
-      "Coming soon to a": {},
-      "Cinema near YOU!": {},
     },
   },
 };
@@ -306,17 +313,18 @@ function resetLowerContent() {
   decisionTreeContainer.innerHTML = "";
 }
 
-// render the tabs
-renderTabs(reasonsData);
+// starter
+createByType(reasonsData);
 
 /*
   this creates the shoelace tab in the bottom half of top left section
   user selects on of these tabs -> renders the options (sub categories as buttons)
 */
-function renderTabs(data) {
-  reasonsTabs.innerHTML = "";
+function createTabs(data) {
+  //reasonsTabs.innerHTML = "";
+  const target = document.querySelector(data.target);
 
-  Object.entries(data).forEach(([tabName, tabContent], index) => {
+  Object.entries(data.categories).forEach(([tabName, tabContent], index) => {
     const tab = document.createElement("sl-tab");
     tab.slot = "nav";
     tab.panel = `panel-${index}`;
@@ -325,7 +333,40 @@ function renderTabs(data) {
     const panel = document.createElement("sl-tab-panel");
     panel.name = `panel-${index}`;
 
-    const buttonContainer = document.createElement("div");
+    const buttonContainer = createBtnSelection(tabContent);
+
+    panel.appendChild(buttonContainer);
+    target.appendChild(tab);
+    target.appendChild(panel);
+  });
+}
+
+const tabGroup = document.querySelector("#reasons-tabs");
+
+tabGroup.addEventListener("sl-tab-show", (event) => {
+  // Clear any previously selected options
+  optionsContainer.innerHTML = "";
+  stepsContent.innerHTML = "";
+  decisionTreeContainer.innerHTML = "";
+  // Also reset all subcategory button variants inside the new panel
+  const newPanelName = event.detail.name;
+  const newPanel = tabGroup.querySelector(
+    `sl-tab-panel[name="${newPanelName}"]`
+  );
+
+  if (newPanel) {
+    const buttons = newPanel.querySelectorAll("sl-button");
+    buttons.forEach((btn) => {
+      btn.variant = "default";
+    });
+  }
+});
+
+
+
+function createBtnSelection(tabContent) {
+
+  const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("two-column-grid");
 
     let activeButton = null;
@@ -356,33 +397,15 @@ function renderTabs(data) {
         }
       );
     }
-
-    panel.appendChild(buttonContainer);
-    reasonsTabs.appendChild(tab);
-    reasonsTabs.appendChild(panel);
-  });
+  return buttonContainer;
 }
 
-const tabGroup = document.querySelector("#reasons-tabs");
 
-tabGroup.addEventListener("sl-tab-show", (event) => {
-  // Clear any previously selected options
-  optionsContainer.innerHTML = "";
-  stepsContent.innerHTML = "";
-  decisionTreeContainer.innerHTML = "";
-  // Also reset all subcategory button variants inside the new panel
-  const newPanelName = event.detail.name;
-  const newPanel = tabGroup.querySelector(
-    `sl-tab-panel[name="${newPanelName}"]`
-  );
 
-  if (newPanel) {
-    const buttons = newPanel.querySelectorAll("sl-button");
-    buttons.forEach((btn) => {
-      btn.variant = "default";
-    });
-  }
-});
+
+
+
+
 
 /* 
   renders the button options at the top of the bottom half (steps container)
@@ -820,6 +843,14 @@ function createByType(data) {
 
     case "conditional": {
       return createConditional(data);
+    }
+
+    case "tabs": {
+      return createTabs(data);
+    }
+
+    case "btn-selection": {
+      return createBtnSelection(data);
     }
 
     default:
