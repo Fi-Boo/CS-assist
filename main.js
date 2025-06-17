@@ -554,7 +554,6 @@ function createOptions(optionsObj) {
 
 function createSteps(data) {
   resetLowerContent();
-  console.log(data);
 
   const wrapper = document.createElement("div"); // This becomes the block
 
