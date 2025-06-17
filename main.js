@@ -11,8 +11,13 @@ const reasonsData = {
             "Payment Plan": {
               notes: "-----\nPayment Plan",
               type: "steps",
-              img: "img/PP-flow.png",
               steps: [
+                {
+                  id: "no-connection-workflow",
+                  type: "image",
+                  url: "img/PP-flow.png",
+                  target: "#decisionTree",
+                },
                 {
                   id: "ppReason",
                   type: "input",
@@ -147,6 +152,10 @@ const reasonsData = {
               categories: {
                 "No Connection": {
                   type: "steps",
+                  image: {
+                    url: "img/PP-flow.png",
+                    target: "#decisionTree",
+                  },
                   steps: [
                     {
                       id: "ppReason",
@@ -374,12 +383,11 @@ createByType(reasonsData);
   user selects on of these tabs -> renders the options (sub categories as buttons)
 */
 function createTabs(data) {
-  //reasonsTabs.innerHTML = "";
   const target = document.querySelector(data.target);
   target.innerHTML = "";
 
-  // Create sl-tab-group wrapper
   const tabGroup = document.createElement("sl-tab-group");
+  tabGroup.id = data.target.replace("#", ""); // e.g., "reasons-tabs"
 
   Object.entries(data.categories).forEach(([tabName, tabContent], index) => {
     const tab = document.createElement("sl-tab");
@@ -390,41 +398,69 @@ function createTabs(data) {
     const panel = document.createElement("sl-tab-panel");
     panel.name = `panel-${index}`;
 
-    let block;
-    if (tabContent.type) {
-      block = createByType(tabContent);
-    } else {
-      block = document.createElement("div")
-      block.innerText = "(No content provided)";
-    }
+    panel.dataset.imageUrl = tabContent.image?.url || "";
+    panel.dataset.imageTarget = tabContent.image?.target || "";
 
+    const block = tabContent.type ? createByType(tabContent) : document.createElement("div");
     panel.appendChild(block);
+
     tabGroup.appendChild(tab);
     tabGroup.appendChild(panel);
   });
+
   target.appendChild(tabGroup);
+
+  // Event listener for tab changes
+  tabGroup.addEventListener("sl-tab-show", (event) => {
+    handleTabShow(tabGroup, event.detail.name);
+  });
+
+  // --- Trigger the tab-show logic for the initially selected tab ---
+
+  // Wait a tick to ensure tabGroup has rendered and set default active tab
+  setTimeout(() => {
+    const selectedPanel = tabGroup.querySelector("sl-tab-panel[active], sl-tab-panel[aria-hidden='false']") 
+      || tabGroup.querySelector("sl-tab-panel"); // fallback first panel
+
+    if (selectedPanel) {
+      handleTabShow(tabGroup, selectedPanel.name);
+    }
+  }, 0);
 }
 
-const tabGroup = document.querySelector("#reasons-tabs");
+// Shared logic for handling tab showing
+function handleTabShow(tabGroup, newPanelName) {
+  if (tabGroup.id === "reasons-tabs") {
+    optionsContainer.innerHTML = "";
+    stepsContent.innerHTML = "";
+    decisionTreeContainer.innerHTML = "";
+  } else if (tabGroup.id === "steps-content") {
+    decisionTreeContainer.innerHTML = "";
+  }
 
-tabGroup.addEventListener("sl-tab-show", (event) => {
-  // Clear any previously selected options
-  optionsContainer.innerHTML = "";
-  stepsContent.innerHTML = "";
-  decisionTreeContainer.innerHTML = "";
-  // Also reset all subcategory button variants inside the new panel
-  const newPanelName = event.detail.name;
-  const newPanel = tabGroup.querySelector(
-    `sl-tab-panel[name="${newPanelName}"]`
-  );
-
+  const newPanel = tabGroup.querySelector(`sl-tab-panel[name="${newPanelName}"]`);
   if (newPanel) {
     const buttons = newPanel.querySelectorAll("sl-button");
-    buttons.forEach((btn) => {
-      btn.variant = "default";
-    });
+    buttons.forEach((btn) => (btn.variant = "default"));
+
+    const imgUrl = newPanel.dataset.imageUrl;
+    const imgTarget = newPanel.dataset.imageTarget;
+    if (imgUrl && imgTarget) {
+      const targetEl = document.querySelector(imgTarget);
+      if (targetEl) {
+        targetEl.innerHTML = "";
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.alt = "Decision Tree";
+        img.style.maxWidth = "100%";
+        img.style.marginBottom = "1rem";
+        targetEl.appendChild(img);
+      }
+    }
   }
-});
+}
+
+
 
 function createBtnSelection(tabContent) {
   const buttonContainer = document.createElement("div");
@@ -518,13 +554,10 @@ function createOptions(optionsObj) {
 
 function createSteps(data) {
   resetLowerContent();
+  console.log(data);
 
-
-  console.log(data)
-  // const header = document.createElement("h3");
-  // header.innerText = data.label;
-  // stepsContent.appendChild(header);
   const wrapper = document.createElement("div"); // This becomes the block
+
   if (data.notes) {
     const existing = notes.value.trim();
     const noteToAdd = data.notes.trim();
@@ -532,26 +565,18 @@ function createSteps(data) {
       existing + (existing.endsWith("\n") ? "" : "\n") + noteToAdd + "\n";
   }
 
-  if (data.img) {
-    const imgEl = document.createElement("img");
-    imgEl.src = data.img;
-    imgEl.alt = " Decision Tree";
-    imgEl.style.maxWidth = "100%";
-    imgEl.style.marginBottom = "1rem";
-
-    decisionTreeContainer.appendChild(imgEl);
-  }
-
   (data.steps || []).forEach((step) => {
-    const stepEl = document.createElement("div");
-    stepEl.classList.add("step");
+    const renderedStep = createByType(step);
 
-    let renderedStep = createByType(step);
-
-    stepEl.appendChild(renderedStep);
-
-    wrapper.appendChild(stepEl);
+    if (renderedStep) {
+      const stepEl = document.createElement("div");
+      stepEl.classList.add("step");
+      stepEl.appendChild(renderedStep);
+      wrapper.appendChild(stepEl);
+    }
+    // else: Step was targeted elsewhere (e.g. image in #decision-tree), skip appending
   });
+
   return wrapper;
 }
 
@@ -627,7 +652,6 @@ function createConditional(data) {
     data.conditions.forEach((cond) => {
       if (shouldShow(cond, conditionalAnswers)) {
         cond.show.forEach((item) => {
-
           const element = createByType(item);
           showContainer.appendChild(element);
         });
@@ -857,6 +881,30 @@ function createInputConfirm(data) {
   return wrapper;
 }
 
+function createImage(data) {
+  let target;
+
+  if (data.target && document.querySelector(data.target)) {
+    // Use the existing target in the DOM
+    target = document.querySelector(data.target);
+    target.innerHTML = ""; // Optional: clear previous content if needed
+  } else {
+    // No valid target found, create a new container to return
+    target = document.createElement("div");
+  }
+
+  const imgEl = document.createElement("img");
+  imgEl.src = data.url;
+  imgEl.alt = "Decision Tree";
+  imgEl.style.maxWidth = "100%";
+  imgEl.style.marginBottom = "1rem";
+
+  target.appendChild(imgEl);
+  console.log("Rendering image to", data.target, "URL:", data.url);
+  // Only return the container if it was not targeted elsewhere
+  return data.target ? null : target;
+}
+
 // Helper to escape regex special characters in prefix/suffix
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -914,6 +962,10 @@ function createByType(data) {
 
     case "steps": {
       return createSteps(data);
+    }
+
+    case "image": {
+      return createImage(data);
     }
 
     default:
