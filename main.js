@@ -1,17 +1,16 @@
-import { Renderer } from "./renderer.js";
-
 const reasonsData = {
   type: "tabs",
   target: "#reasons-tabs",
   categories: {
     Accounts: {
       type: "btn-selection",
-      target:"option-buttons",
+      target: "#option-buttons",
       subCategories: {
         "Billing Issues/Enquiry": {
           options: {
             "Payment Plan": {
               notes: "-----\nPayment Plan",
+              type: "steps",
               img: "img/PP-flow.png",
               steps: [
                 {
@@ -137,10 +136,62 @@ const reasonsData = {
     },
 
     Technical: {
+      type: "btn-selection",
+      target: "#option-buttons",
       subCategories: {
         NBN: {
           options: {
-            FTTP: {},
+            FTTP: {
+              type: "tabs",
+              target: "#steps-content",
+              categories: {
+                "No Connection": {
+                  type: "steps",
+                  steps: [
+                    {
+                      id: "ppReason",
+                      type: "input",
+                      placeholder: "Input reason for PP here",
+                      noteTemplate: "PP Reason: {input}",
+                    },
+                    {
+                      id: "ppReason",
+                      type: "input",
+                      placeholder: "Input reason for PP here",
+                      noteTemplate: "PP Reason: {input}",
+                    },
+                  ],
+                },
+                Dropouts: {
+                  type: "steps",
+                  steps: [
+                    {
+                      id: "ppReason",
+                      type: "input",
+                      placeholder: "dropouts",
+                      noteTemplate: "PP Reason: {input}",
+                    },
+                    {
+                      id: "ppReason",
+                      type: "input",
+                      placeholder: "dropouts",
+                      noteTemplate: "PP Reason: {input}",
+                    },
+                  ],
+                },
+                "Slow Speeds": {
+                  type: "steps",
+                  steps: [
+                    {
+                      id: "ppReason",
+                      type: "input",
+                      placeholder: "slow speeds",
+                      noteTemplate: "PP Reason: {input}",
+                    },
+                  ],
+                },
+              },
+            },
             "FTTN/B": {},
             FTTC: {},
             HFC: {},
@@ -156,6 +207,8 @@ const reasonsData = {
       },
     },
     Provisioning: {
+      type: "btn-selection",
+      target: "#option-buttons",
       subCategories: {
         "Coming soon to a": {},
         "Cinema near YOU!": {},
@@ -323,6 +376,10 @@ createByType(reasonsData);
 function createTabs(data) {
   //reasonsTabs.innerHTML = "";
   const target = document.querySelector(data.target);
+  target.innerHTML = "";
+
+  // Create sl-tab-group wrapper
+  const tabGroup = document.createElement("sl-tab-group");
 
   Object.entries(data.categories).forEach(([tabName, tabContent], index) => {
     const tab = document.createElement("sl-tab");
@@ -333,12 +390,19 @@ function createTabs(data) {
     const panel = document.createElement("sl-tab-panel");
     panel.name = `panel-${index}`;
 
-    const buttonContainer = createBtnSelection(tabContent);
+    let block;
+    if (tabContent.type) {
+      block = createByType(tabContent);
+    } else {
+      block = document.createElement("div")
+      block.innerText = "(No content provided)";
+    }
 
-    panel.appendChild(buttonContainer);
-    target.appendChild(tab);
-    target.appendChild(panel);
+    panel.appendChild(block);
+    tabGroup.appendChild(tab);
+    tabGroup.appendChild(panel);
   });
+  target.appendChild(tabGroup);
 }
 
 const tabGroup = document.querySelector("#reasons-tabs");
@@ -362,56 +426,46 @@ tabGroup.addEventListener("sl-tab-show", (event) => {
   }
 });
 
-
-
 function createBtnSelection(tabContent) {
-
   const buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("two-column-grid");
+  buttonContainer.classList.add("two-column-grid");
 
-    let activeButton = null;
+  let activeButton = null;
 
-    if (tabContent.subCategories) {
-      Object.entries(tabContent.subCategories).forEach(
-        ([subCatName, subCatData]) => {
-          const button = document.createElement("sl-button");
-          button.innerText = subCatName;
-          button.size = "small";
-          button.variant = "default"; // inactive state
+  if (tabContent.subCategories) {
+    Object.entries(tabContent.subCategories).forEach(
+      ([subCatName, subCatData]) => {
+        const button = document.createElement("sl-button");
+        button.innerText = subCatName;
+        button.size = "small";
+        button.variant = "default"; // inactive state
 
-          button.addEventListener("click", () => {
-            // Reset previous
-            resetLowerContent();
-            if (activeButton && activeButton !== button) {
-              activeButton.variant = "default";
-            }
+        button.addEventListener("click", () => {
+          // Reset previous
+          resetLowerContent();
+          if (activeButton && activeButton !== button) {
+            activeButton.variant = "default";
+          }
 
-            // Set current
-            button.variant = "primary"; // visually stands out
-            activeButton = button;
+          // Set current
+          button.variant = "primary"; // visually stands out
+          activeButton = button;
 
-            renderOptions(subCatData.options || {});
-          });
+          createOptions(subCatData.options || {});
+        });
 
-          buttonContainer.appendChild(button);
-        }
-      );
-    }
+        buttonContainer.appendChild(button);
+      }
+    );
+  }
   return buttonContainer;
 }
-
-
-
-
-
-
-
 
 /* 
   renders the button options at the top of the bottom half (steps container)
   selecting an option will load data into the bottom half
 */
-function renderOptions(optionsObj) {
+function createOptions(optionsObj) {
   optionsContainer.innerHTML = ""; // Clear previous options
 
   if (Object.keys(optionsObj).length === 0) {
@@ -445,7 +499,12 @@ function renderOptions(optionsObj) {
 
       console.log(`Selected option: ${optionKey}`);
       // Future: Load steps or details into steps-content
-      renderSteps(optionKey, optionData);
+
+      stepsContent.innerHTML = "";
+      const rendered = createByType(optionData);
+      if (rendered) {
+        stepsContent.appendChild(rendered);
+      }
     });
 
     flexContainer.appendChild(btn);
@@ -457,13 +516,15 @@ function renderOptions(optionsObj) {
 // ----------------------------------------------------------
 // ---------- Render Steps ----------------------------------
 
-function renderSteps(label, data) {
+function createSteps(data) {
   resetLowerContent();
 
-  const header = document.createElement("h3");
-  header.innerText = label;
-  stepsContent.appendChild(header);
 
+  console.log(data)
+  // const header = document.createElement("h3");
+  // header.innerText = data.label;
+  // stepsContent.appendChild(header);
+  const wrapper = document.createElement("div"); // This becomes the block
   if (data.notes) {
     const existing = notes.value.trim();
     const noteToAdd = data.notes.trim();
@@ -474,7 +535,7 @@ function renderSteps(label, data) {
   if (data.img) {
     const imgEl = document.createElement("img");
     imgEl.src = data.img;
-    imgEl.alt = label + " Decision Tree";
+    imgEl.alt = " Decision Tree";
     imgEl.style.maxWidth = "100%";
     imgEl.style.marginBottom = "1rem";
 
@@ -489,8 +550,9 @@ function renderSteps(label, data) {
 
     stepEl.appendChild(renderedStep);
 
-    stepsContent.appendChild(stepEl);
+    wrapper.appendChild(stepEl);
   });
+  return wrapper;
 }
 
 /*
@@ -538,7 +600,7 @@ function createInput(data) {
 
 // Conditional fuction
 let conditionalAnswers = {};
-const conditionRenderers = [];
+const conditionCreator = [];
 
 function createConditional(data) {
   const block = document.createElement("div");
@@ -558,16 +620,14 @@ function createConditional(data) {
   block.appendChild(showContainer); // placeholder for conditional results
 
   // Define render function
-  function checkAndRender() {
+  function checkAndCreate() {
     // Clear previous
     showContainer.innerHTML = "";
 
     data.conditions.forEach((cond) => {
       if (shouldShow(cond, conditionalAnswers)) {
         cond.show.forEach((item) => {
-          console.log(cond);
-          console.log(conditionalAnswers);
-          console.log(shouldShow(cond, conditionalAnswers));
+
           const element = createByType(item);
           showContainer.appendChild(element);
         });
@@ -576,7 +636,7 @@ function createConditional(data) {
   }
 
   // Register this render function
-  conditionRenderers.push(checkAndRender);
+  conditionCreator.push(checkAndCreate);
   // // Make the render function accessible from outside
   // window._triggerConditionRender = checkAndRender;
 
@@ -627,10 +687,9 @@ function createRadio(data) {
   // Add event listener to capture selection
   radioGroup.addEventListener("sl-change", (event) => {
     conditionalAnswers[data.id] = event.target.value;
-    //console.log(conditionalAnswers); // optional debug
 
     // Trigger ALL conditional renders
-    conditionRenderers.forEach((fn) => fn());
+    conditionCreator.forEach((fn) => fn());
     // // Trigger render check
     // if (typeof window._triggerConditionRender === "function") {
     //   window._triggerConditionRender();
@@ -851,6 +910,10 @@ function createByType(data) {
 
     case "btn-selection": {
       return createBtnSelection(data);
+    }
+
+    case "steps": {
+      return createSteps(data);
     }
 
     default:
