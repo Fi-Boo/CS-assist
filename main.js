@@ -1,19 +1,32 @@
 const reasonsData = {
+  id: "reasons-tab",
   type: "tabs",
   target: "#reasons-tabs",
   categories: {
     Accounts: {
+      id: "accounts",
       type: "btn-selection",
       target: "#option-buttons",
       subCategories: {
         "Billing Issues/Enquiry": {
+          type: "options",
           options: {
             "Payment Plan": {
               notes: "-----\nPayment Plan",
               type: "steps",
               steps: [
                 {
-                  id: "no-connection-workflow",
+                  id: "ppHeader",
+                  type: "header",
+                  header: "Payment Plan",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/Billing-Hub.aspx?from=SendByEmail&e=APMcLauJhUeist5une3-Kw&at=121&CT=1744015659473&OR=OWA-NT-Mail&CID=337e4d01-af16-a968-6d3d-2be34420f342#payment-plans-and-self-sufficiency",
+                    title: "Billing Hub - Payment plans and self sufficiency",
+                  },
+                },
+                {
+                  id: "PP-workflow",
                   type: "image",
                   url: "img/PP-flow.png",
                   target: "#decisionTree",
@@ -131,7 +144,22 @@ const reasonsData = {
             "Once Off Payment": {},
           },
         },
-        "Transfer of Ownership (ToO)": {},
+        "Transfer of Ownership (ToO)": {
+          type: "steps",
+          notes: "-----\nTransfer of Ownership",
+          steps: [
+            {
+              id: "TooHeader",
+              type: "header",
+              header: "Transfer of Ownership",
+              class: "primHeader",
+              link: {
+                url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/Transfer-of-ownership-process-(Residential).aspx",
+                title: "Transfer of Ownership Process",
+              },
+            },
+          ],
+        },
         "Edit/Update Details": {},
         "Service Closure": {},
         "Add Secondary Contact": {},
@@ -141,72 +169,460 @@ const reasonsData = {
     },
 
     Technical: {
+      id: "technical",
       type: "btn-selection",
       target: "#option-buttons",
       subCategories: {
         NBN: {
           options: {
             FTTP: {
-              type: "tabs",
-              target: "#steps-content",
-              categories: {
-                "No Connection": {
-                  type: "steps",
-                  image: {
-                    url: "img/PP-flow.png",
-                    target: "#decisionTree",
+              id: "FTTP",
+              type: "steps",
+              steps: [
+                {
+                  id: "FTTPHeader",
+                  type: "header",
+                  header: "Fibre to the Premises",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/FTTP.aspx",
+                    title: "FTTP Hub",
                   },
-                  steps: [
-                    {
-                      id: "ppReason",
-                      type: "input",
-                      placeholder: "Input reason for PP here",
-                      noteTemplate: "PP Reason: {input}",
-                    },
-                    {
-                      id: "ppReason",
-                      type: "input",
-                      placeholder: "Input reason for PP here",
-                      noteTemplate: "PP Reason: {input}",
-                    },
-                  ],
                 },
-                Dropouts: {
-                  type: "steps",
-                  steps: [
-                    {
-                      id: "ppReason",
-                      type: "input",
-                      placeholder: "dropouts",
-                      noteTemplate: "PP Reason: {input}",
+                {
+                  id: "FTTPTabs",
+                  type: "tabs",
+                  //target: "#steps-content",
+                  categories: {
+                    "No Connection": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttpNoconSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTP no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
                     },
-                    {
-                      id: "ppReason",
-                      type: "input",
-                      placeholder: "dropouts",
-                      noteTemplate: "PP Reason: {input}",
+                    Dropouts: {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttpDropSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTP no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
                     },
-                  ],
+                    "Slow Speeds": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttpSlowSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTP no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                  },
                 },
-                "Slow Speeds": {
-                  type: "steps",
-                  steps: [
-                    {
-                      id: "ppReason",
-                      type: "input",
-                      placeholder: "slow speeds",
-                      noteTemplate: "PP Reason: {input}",
-                    },
-                  ],
-                },
-              },
+              ],
             },
-            "FTTN/B": {},
-            FTTC: {},
-            HFC: {},
-            "F/W": {},
+            "FTTN/B": {
+              id: "FTTN",
+              type: "steps",
+              steps: [
+                {
+                  id: "FTTNHeader",
+                  type: "header",
+                  header: "Fibre to the Node/Building",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/FTTN-FTTB.aspx",
+                    title: "FTTN/B Hub",
+                  },
+                },
+                {
+                  id: "FTTNTabs",
+                  type: "tabs",
+                  //target: "#steps-content",
+                  categories: {
+                    "No Connection": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttnNoconSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTN/B no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    Dropouts: {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttnDropSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTN/B no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    "Slow Speeds": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttnSlowSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTN/B no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+            FTTC: {
+              id: "FTTC",
+              type: "steps",
+              steps: [
+                {
+                  id: "FTTCHeader",
+                  type: "header",
+                  header: "Fibre to the Curb",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/FTTC-Tr.aspx",
+                    title: "FTTC Hub",
+                  },
+                },
+                {
+                  id: "FTTCTabs",
+                  type: "tabs",
+                  //target: "#steps-content",
+                  categories: {
+                    "No Connection": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttcNoconSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    Dropouts: {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttcDropSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    "Slow Speeds": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fttcSlowSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FTTC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+            HFC: {
+              id: "HFC",
+              type: "steps",
+              steps: [
+                {
+                  id: "HFCHeader",
+                  type: "header",
+                  header: "Hybrid Fibre Coaxial",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/HFC-Hub.aspx",
+                    title: "HFC Hub",
+                  },
+                },
+                {
+                  id: "HFCTabs",
+                  type: "tabs",
+                  //target: "#steps-content",
+                  categories: {
+                    "No Connection": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "hfcNoconSummary",
+                          type: "input-confirm",
+                          placeholder: "Input HFC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    Dropouts: {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "hfcDropSummary",
+                          type: "input-confirm",
+                          placeholder: "Input HFC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    "Slow Speeds": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "hfcSlowSummary",
+                          type: "input-confirm",
+                          placeholder: "Input HFC no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+            "F/W": {
+              id: "FW",
+              type: "steps",
+              steps: [
+                {
+                  id: "FWHeader",
+                  type: "header",
+                  header: "Fixed Wireless",
+                  class: "primHeader",
+                  link: {
+                    url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/Fixed-Wireless.aspx",
+                    title: "Fixed Wireless Hub",
+                  },
+                },
+                {
+                  id: "FWTabs",
+                  type: "tabs",
+                  //target: "#steps-content",
+                  categories: {
+                    "No Connection": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fwNoconSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FW no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    Dropouts: {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fwDropSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FW no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                    "Slow Speeds": {
+                      type: "steps",
+                      image: {
+                        url: "img/PP-flow.png",
+                        target: "#decisionTree",
+                      },
+                      steps: [
+                        {
+                          id: "step1",
+                          type: "info",
+                          text: "step guide coming soon",
+                          info: "stuff",
+                        },
+                        {
+                          id: "fwSlowSummary",
+                          type: "input-confirm",
+                          placeholder: "Input FW no connection steps",
+                          buttonLabel: "Add",
+                          noteTemplate: "T/S details:\n{input}\n-x-\n",
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
           },
         },
+
         Opticomm: {},
         VOIP: {},
         Mobile: {},
@@ -383,11 +799,12 @@ createByType(reasonsData);
   user selects on of these tabs -> renders the options (sub categories as buttons)
 */
 function createTabs(data) {
-  const target = document.querySelector(data.target);
-  target.innerHTML = "";
+  const target = data.target
+    ? Object.assign(document.querySelector(data.target), { innerHTML: "" })
+    : document.createElement("div");
 
   const tabGroup = document.createElement("sl-tab-group");
-  tabGroup.id = data.target.replace("#", ""); // e.g., "reasons-tabs"
+  tabGroup.id = data.id.replace("#", ""); // e.g., "reasons-tabs"
 
   Object.entries(data.categories).forEach(([tabName, tabContent], index) => {
     const tab = document.createElement("sl-tab");
@@ -401,7 +818,9 @@ function createTabs(data) {
     panel.dataset.imageUrl = tabContent.image?.url || "";
     panel.dataset.imageTarget = tabContent.image?.target || "";
 
-    const block = tabContent.type ? createByType(tabContent) : document.createElement("div");
+    const block = tabContent.type
+      ? createByType(tabContent)
+      : document.createElement("div");
     panel.appendChild(block);
 
     tabGroup.appendChild(tab);
@@ -419,13 +838,17 @@ function createTabs(data) {
 
   // Wait a tick to ensure tabGroup has rendered and set default active tab
   setTimeout(() => {
-    const selectedPanel = tabGroup.querySelector("sl-tab-panel[active], sl-tab-panel[aria-hidden='false']") 
-      || tabGroup.querySelector("sl-tab-panel"); // fallback first panel
+    const selectedPanel =
+      tabGroup.querySelector(
+        "sl-tab-panel[active], sl-tab-panel[aria-hidden='false']"
+      ) || tabGroup.querySelector("sl-tab-panel"); // fallback first panel
 
     if (selectedPanel) {
       handleTabShow(tabGroup, selectedPanel.name);
     }
   }, 0);
+
+  return target;
 }
 
 // Shared logic for handling tab showing
@@ -438,7 +861,9 @@ function handleTabShow(tabGroup, newPanelName) {
     decisionTreeContainer.innerHTML = "";
   }
 
-  const newPanel = tabGroup.querySelector(`sl-tab-panel[name="${newPanelName}"]`);
+  const newPanel = tabGroup.querySelector(
+    `sl-tab-panel[name="${newPanelName}"]`
+  );
   if (newPanel) {
     const buttons = newPanel.querySelectorAll("sl-button");
     buttons.forEach((btn) => (btn.variant = "default"));
@@ -460,8 +885,6 @@ function handleTabShow(tabGroup, newPanelName) {
   }
 }
 
-
-
 function createBtnSelection(tabContent) {
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("two-column-grid");
@@ -478,16 +901,31 @@ function createBtnSelection(tabContent) {
 
         button.addEventListener("click", () => {
           // Reset previous
+          optionsContainer.innerHTML = "";
           resetLowerContent();
           if (activeButton && activeButton !== button) {
             activeButton.variant = "default";
           }
-
-          // Set current
-          button.variant = "primary"; // visually stands out
+          // Highlight this one
+          button.variant = "primary";
           activeButton = button;
 
-          createOptions(subCatData.options || {});
+          // Handle both "options" object and direct "type"
+          if (subCatData.options) {
+            createOptions(subCatData.options);
+          } else if (subCatData.type) {
+            // Directly render steps, tabs, etc.
+            stepsContent.innerHTML = "";
+            console.log("here?");
+            const rendered = createByType(subCatData);
+
+            if (rendered) stepsContent.appendChild(rendered);
+          } else {
+            stepsContent.innerHTML = "";
+            const fallback = document.createElement("p");
+            fallback.textContent = "No content available.";
+            stepsContent.appendChild(fallback);
+          }
         });
 
         buttonContainer.appendChild(button);
@@ -502,17 +940,18 @@ function createBtnSelection(tabContent) {
   selecting an option will load data into the bottom half
 */
 function createOptions(optionsObj) {
-  optionsContainer.innerHTML = ""; // Clear previous options
+  optionsContainer.innerHTML = "";
+  stepsContent.innerHTML = "";
 
-  if (Object.keys(optionsObj).length === 0) {
-    const noneText = document.createElement("p");
-    noneText.innerText = "No options available.";
-    optionsContainer.appendChild(noneText);
+  if (!optionsObj || Object.keys(optionsObj).length === 0) {
+    const none = document.createElement("p");
+    none.textContent = "No options available.";
+    optionsContainer.appendChild(none);
     return;
   }
 
-  const flexContainer = document.createElement("div");
-  flexContainer.classList.add("option-buttons-row");
+  const container = document.createElement("div");
+  container.classList.add("option-buttons-row");
 
   let activeOptionBtn = null;
 
@@ -521,32 +960,24 @@ function createOptions(optionsObj) {
     btn.innerText = optionKey;
     btn.variant = "default";
     btn.size = "small";
-    btn.className = "options-btn";
+    btn.classList.add("option-button");
 
     btn.addEventListener("click", () => {
-      // Reset previous active button
       if (activeOptionBtn && activeOptionBtn !== btn) {
         activeOptionBtn.variant = "default";
       }
-
-      // Set current active button
       btn.variant = "primary";
       activeOptionBtn = btn;
 
-      console.log(`Selected option: ${optionKey}`);
-      // Future: Load steps or details into steps-content
-
       stepsContent.innerHTML = "";
       const rendered = createByType(optionData);
-      if (rendered) {
-        stepsContent.appendChild(rendered);
-      }
+      if (rendered) stepsContent.appendChild(rendered);
     });
 
-    flexContainer.appendChild(btn);
+    container.appendChild(btn);
   });
 
-  optionsContainer.appendChild(flexContainer);
+  optionsContainer.appendChild(container);
 }
 
 // ----------------------------------------------------------
@@ -917,6 +1348,20 @@ function createByType(data) {
       header.innerHTML = data.header;
       header.classList.add(data.class);
 
+      if (data.link) {
+        const headerLink = document.createElement("a");
+        headerLink.href = data.link.url;
+        headerLink.target = "_blank";
+        headerLink.rel = "noopener noreferrer";
+
+        const linkIcon = document.createElement("sl-icon-button");
+        linkIcon.name = "link-45deg";
+        linkIcon.title = data.link.title;
+
+        headerLink.appendChild(linkIcon);
+        header.appendChild(headerLink);
+      }
+
       headerBlock.appendChild(document.createElement("hr"));
       headerBlock.appendChild(header);
       return headerBlock;
@@ -969,5 +1414,6 @@ function createByType(data) {
 
     default:
       console.warn("Unsupported step type:", data.type);
+      return document.createElement("div"); // fallback safe return
   }
 }
