@@ -12,7 +12,7 @@ const reasonsData = {
           type: "options",
           options: {
             "Payment Plan": {
-              notes: "-----\nPayment Plan",
+              note: "-----\nPayment Plan",
               type: "steps",
               steps: [
                 {
@@ -62,7 +62,7 @@ const reasonsData = {
                   ],
                   conditions: [
                     {
-                      if: [{ q1: "Yes" }, { q3: "Yes" }],
+                      if: [{ q1: "Yes" }, { q2: "Yes" }],
                       logic: "OR",
                       show: [
                         {
@@ -94,16 +94,16 @@ const reasonsData = {
                 {
                   id: "ppSummary",
                   type: "input-confirm",
-                  placeholder: "Paste/Input PP details here",
+                  placeholder: "Input any conditions here. i.e. immediate payment of XX actioned",
                   buttonLabel: "Add",
-                  noteTemplate: "PP details:\n{input}\n-x-\n",
+                  noteTemplate: "Conditions:\n{input}\n-x-\n",
                 },
                 {
                   id: "restrictionResult",
                   type: "conditional",
                   conditions: [
                     {
-                      if: [{ q3: "Yes" }],
+                      if: [{ q2: "Yes" }],
                       show: [
                         {
                           id: "header1",
@@ -138,7 +138,7 @@ const reasonsData = {
               ],
             },
             "Immediate Payment": {
-              notes: "-----\nImmediate Plan",
+              note: "-----\nImmediate Plan",
               steps: [],
             },
             "Once Off Payment": {},
@@ -146,7 +146,7 @@ const reasonsData = {
         },
         "Transfer of Ownership (ToO)": {
           type: "steps",
-          notes: "-----\nTransfer of Ownership",
+          note: "-----\nTransfer of Ownership",
           steps: [
             {
               id: "TooHeader",
@@ -988,9 +988,9 @@ function createSteps(data) {
 
   const wrapper = document.createElement("div"); // This becomes the block
 
-  if (data.notes) {
+  if (data.note) {
     const existing = notes.value.trim();
-    const noteToAdd = data.notes.trim();
+    const noteToAdd = data.note.trim();
     notes.value =
       existing + (existing.endsWith("\n") ? "" : "\n") + noteToAdd + "\n";
   }
