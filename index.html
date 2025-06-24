@@ -27,7 +27,7 @@
               rel="noopener"
             >
               <sl-icon-button
-                name="link-45deg"  
+                name="link-45deg"
                 title="All departments contact/hours"
               ></sl-icon-button>
             </a>
@@ -65,19 +65,19 @@
               >
                 <sl-icon-button
                   name="link-45deg"
-                  title="Customer Permissions Table" 
+                  title="Customer Permissions Table"
                 ></sl-icon-button
               ></a>
             </sl-radio-group>
           </div>
 
           <div class="form-row">
-            <div class="form-row">
+            <div class="form-row-splitLeft">
               <label for="ID-checkbox">Identified</label>
               <sl-checkbox id="ID-checkbox"></sl-checkbox>
             </div>
 
-            <div class="form-row form-2fa">
+            <div class="form-row-splitRight form-2fa">
               <label for="TFA-checkbox">2FA</label>
               <sl-checkbox id="TFA-checkbox"></sl-checkbox>
             </div>
@@ -88,6 +88,7 @@
             <sl-radio-group size="small" name="callType" id="caller-type">
               <sl-radio-button value="1">Inbound</sl-radio-button>
               <sl-radio-button value="2">Outbound</sl-radio-button>
+              <sl-radio-button value="3">Callback</sl-radio-button>
             </sl-radio-group>
           </div>
           <div id="callPrompt" class="info-text important hidden">
@@ -98,7 +99,17 @@
               1300 880 905
             </p>
           </div>
+          <div class="form-row">
+            <div class="form-row-splitLeft">
+              <label for="calldropped">Call Dropped</label>
+              <sl-checkbox id="calldropped"></sl-checkbox>
+            </div>
 
+            <div class="form-row-splitRight form-2fa">
+              <label for="callback">2FA Declined</label>
+              <sl-checkbox id="callback"></sl-checkbox>
+            </div>
+          </div>
           <sl-tab-group id="reasons-tabs"></sl-tab-group>
 
           <sl-dialog label="Notice" id="clipboard-dialog">

@@ -94,7 +94,8 @@ const reasonsData = {
                 {
                   id: "ppSummary",
                   type: "input-confirm",
-                  placeholder: "Input any conditions here. i.e. immediate payment of XX actioned",
+                  placeholder:
+                    "Input any conditions here. i.e. immediate payment of XX actioned",
                   buttonLabel: "Add",
                   noteTemplate: "Conditions:\n{input}\n-x-\n",
                 },
@@ -648,13 +649,17 @@ const radioGroupCMS = document.querySelector('sl-radio-group[name="CMSfound"]');
 const CMSnote = document.getElementById("CMSmissing"); // caller CMS info for NO selector
 const radioGroupCallType = document.querySelector(
   'sl-radio-group[name="callType"]'
-); // caller Type => in/out
+);
+
+// caller Type => in/out
 const callPrompt = document.getElementById("callPrompt"); // caller Type prompt
 const customerInput = document.querySelector("#customerName-input"); // input field for customer name
 const idCheckbox = document.querySelector("#ID-checkbox"); // ID checkbox
 const tfaCheckbox = document.querySelector("#TFA-checkbox"); // 2FA checkbox
 const tfaCheckboxText = document.querySelector("#TFA-checkbox"); // text area next to 2FA checkbox
 const callerType = document.querySelector("#caller-class"); // caller class => Primary/Secondary
+const callDropped = document.querySelector("#calldropped");
+const callBack2FADeclined = document.querySelector("#callback");
 
 // Right-panel
 const copyNotesBtn = document.querySelector("#copy-notes-btn"); // copy to notes btn
@@ -690,10 +695,10 @@ if (radioGroupCMS) {
 // shows outbound MUST do steps.
 radioGroupCallType.addEventListener("sl-change", (event) => {
   const selectedValue = event.target.value;
-  if (selectedValue === "2") {
+  if (selectedValue === "2" || selectedValue === "3") {
     callPrompt.classList.remove("hidden");
     if (!tfaCheckbox.checked) {
-      tfaCheckboxText.innerHTML = "DO IT! DO IT!";
+      tfaCheckboxText.innerHTML = "DO IT!";
     }
     setTimeout(() => {
       callPrompt.classList.add("hidden");
@@ -703,6 +708,35 @@ radioGroupCallType.addEventListener("sl-change", (event) => {
     tfaCheckboxText.innerHTML = "";
   }
 });
+
+callDropped.addEventListener("sl-change", () => {
+  const checked = callDropped.checked;
+  const noteText = "call dropped";
+
+  updateCheckbox(checked, noteText);
+  
+});
+
+callBack2FADeclined.addEventListener("sl-change", () => {
+  const checked = callBack2FADeclined.checked;
+  const noteText = "eu declined outbound 2fa. adv eu to call 1300 880 905";
+
+  updateCheckbox(checked, noteText);
+})
+
+function updateCheckbox(checked, noteText) {
+  // Add/remove main note
+  if (checked && noteText && !notes.value.includes(noteText)) {
+    notes.value += (notes.value.endsWith("\n") ? "" : "\n") + noteText + "\n";
+  } else if (!checked && noteText) {
+    notes.value =
+      notes.value
+        .split("\n")
+        .filter((line) => line !== noteText)
+        .join("\n")
+        .trim() + "\n";
+  }
+}
 
 // gets the notes header and populates it with current data from top-left panel
 function getDynamicHeader() {
@@ -717,6 +751,8 @@ function getDynamicHeader() {
     callTypeValue = "In";
   } else if (selectedValue === "2") {
     callTypeValue = "Out (adv eu of recording)";
+  } else if (selectedValue === "3") {
+    callTypeValue = "In & Callback (adv eu of recording)";
   }
 
   return `Customer: ${customerName}\nID: ${idConfirmed}\n2FA: ${tfaConfirmed}\nCall: ${callTypeValue}\n-----\nNotes`;
@@ -1034,6 +1070,7 @@ function createWarning(data) {
 function createInput(data) {
   const block = document.createElement("sl-input");
   block.placeholder = data.placeholder;
+  block.style.marginBottom = "0.5rem";
 
   if (data.noteTemplate) {
     block.addEventListener("input", () => {
@@ -1347,6 +1384,7 @@ function createByType(data) {
       const header = document.createElement("h2");
       header.innerHTML = data.header;
       header.classList.add(data.class);
+      header.style.marginBottom = "0.5rem";
 
       if (data.link) {
         const headerLink = document.createElement("a");
