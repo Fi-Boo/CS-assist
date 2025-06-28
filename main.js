@@ -159,10 +159,55 @@ const reasonsData = {
                 title: "Transfer of Ownership Process",
               },
             },
+            {
+              id: "PP-workflow",
+              type: "image",
+              url: "img/PP-flow.png",
+              target: "#decisionTree",
+            },
           ],
         },
         "Edit/Update Details": {},
-        "Service Closure": {},
+        "Service Closure": {
+          type: "steps",
+          note: "-----\nService Closure",
+          steps: [
+            {
+              id: "TooHeader",
+              type: "header",
+              header: "Service Closure/Cancellation",
+              class: "primHeader",
+              link: {
+                url: "https://aussiebroadband.sharepoint.com/sites/CustomerService/SitePages/Service-Closures.aspx",
+                title: "Closure of Service",
+              },
+            },
+            {
+              id: "PP-workflow",
+              type: "image",
+              url: "img/Closure-flow.png",
+              target: "#decisionTree",
+            },
+            {
+              id: "closureReason",
+              type: "input",
+              placeholder: "Input Closure Rqst reason",
+              noteTemplate: "Closure Reason: {input}",
+            },
+            {
+              id: "closureReason",
+              type: "input",
+              placeholder: "Input Competitors offer (if applicable)",
+              noteTemplate: "Competitors offer: {input}",
+            },
+            {
+              id: "TFA-checkbox2",
+              class: "TFA",
+              type: "checkbox",
+              label: "2FA",
+            }
+          ],
+        },
         "Add Secondary Contact": {},
         Complaint: {},
         "Plan Speed Change": {},
@@ -674,6 +719,7 @@ const stepsContent = document.getElementById("steps-content");
 const decisionTreeContainer = document.getElementById("decisionTree");
 const reasonsTabs = document.getElementById("reasons-tabs");
 const stepsContainer = document.getElementById("steps-container");
+let tfaCheckbox2 = document.querySelectorAll(".TFA");
 
 // TOP-LEFT panel
 if (radioGroupCMS) {
@@ -714,7 +760,6 @@ callDropped.addEventListener("sl-change", () => {
   const noteText = "call dropped";
 
   updateCheckbox(checked, noteText);
-  
 });
 
 callBack2FADeclined.addEventListener("sl-change", () => {
@@ -722,7 +767,7 @@ callBack2FADeclined.addEventListener("sl-change", () => {
   const noteText = "eu declined outbound 2fa. adv eu to call 1300 880 905";
 
   updateCheckbox(checked, noteText);
-})
+});
 
 function updateCheckbox(checked, noteText) {
   // Add/remove main note
@@ -762,6 +807,14 @@ idCheckbox.addEventListener("sl-change", updateNotesHeaderOnly);
 radioGroupCallType.addEventListener("sl-change", updateNotesHeaderOnly);
 tfaCheckbox.addEventListener("sl-change", () => {
   updateNotesHeaderOnly();
+
+  tfaCheckbox2 = document.querySelectorAll(".TFA");
+
+  if (tfaCheckbox2) {
+    tfaCheckbox2.forEach((tfa) => {
+      tfa.checked = tfaCheckbox.checked;
+    });
+  }
 
   if (tfaCheckbox.checked) {
     tfaCheckboxText.innerHTML = "";
@@ -1209,6 +1262,10 @@ function createCheckbox(data) {
   label.style.userSelect = "none"; // optional: prevent label text selection on checkbox click
   const checkbox = document.createElement("sl-checkbox");
   checkbox.id = data.id;
+  if (data.class) {
+    checkbox.classList.add(data.class);
+    checkbox.checked = tfaCheckbox.checked;
+  }
 
   let conditionalInput;
   if (data.conditionalInput) {
@@ -1234,6 +1291,11 @@ function createCheckbox(data) {
           .trim() + "\n";
     }
 
+    if (checkbox.classList.contains("TFA")) {
+      tfaCheckbox.checked = checked;
+      updateNotesHeaderOnly();
+    }
+
     // Handle conditional input toggle
     if (conditionalInput) {
       conditionalInput.classList.toggle("hidden", !checked);
@@ -1255,7 +1317,7 @@ function createCheckbox(data) {
       });
     }
 
-    // 🚫 Mutual Exclusivity Logic
+    // Mutual Exclusivity Logic
     if (checked && Array.isArray(data.exclusiveWith)) {
       data.exclusiveWith.forEach((id) => {
         const other = document.querySelector(`#${id}`);
